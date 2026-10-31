@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ko" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스마트 글자수 & 바이트 계산기</title>
+    <!-- Pretendard 폰트 -->
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Pretendard', 'sans-serif'] },
+                    colors: {
+                        excel: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#107c41', // Microsoft Excel 시그니처 딥그린
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col justify-between transition-colors duration-200">
+
+    <!-- 상단 헤더 -->
+    <header
+        class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 py-3.5 px-6 shadow-sm sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="../index.html"
+                    class="text-lg font-bold text-excel-900 dark:text-emerald-400 flex items-center gap-2">
+                    <span
+                        class="w-7 h-7 bg-excel-900 text-white rounded-md flex items-center justify-center text-xs font-black shadow-sm">X</span>
+                    <span>스마트 툴킷</span>
+                </a>
+                <span
+                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    🔒 100% 브라우저 보안 처리
+                </span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- 다크모드 토글 버튼 -->
+                <button id="darkModeToggle"
+                    class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
+                    <svg id="sunIcon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <svg id="moonIcon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="max-w-5xl w-full mx-auto p-4 sm:p-6 my-4 flex-grow">
+
+        <!-- 타이틀 섹션 -->
+        <div
+            class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    실시간 글자수 & 바이트 분석기
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-0.5">서버 전송 없이 안전하게 글자수와 바이트를 실시간으로
+                    계산합니다.</p>
+            </div>
+            <div class="text-xs text-slate-400 dark:text-slate-500">
+                인터넷 연결 없이도 완벽 작동
+            </div>
+        </div>
+
+        <!-- 2열 레이아웃 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- 좌측 메인 입력 영역 (7열) -->
+            <div class="lg:col-span-7 flex flex-col">
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-4 flex-grow flex flex-col">
+
+                    <!-- 툴바 영역 -->
+                    <div
+                        class="flex flex-wrap justify-between items-center mb-3 gap-2 border-b border-slate-100 dark:border-slate-700/60 pb-3">
+                        <div class="flex flex-wrap gap-2">
+                            <button id="formatTrimBtn"
+                                class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-emerald-50 hover:text-excel-900 text-xs font-medium rounded-md transition text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600">
+                                🧹 공백정리
+                            </button>
+                            <button id="copyBtn"
+                                class="px-3 py-1.5 bg-excel-900 text-white hover:bg-excel-800 text-xs font-medium rounded-md transition shadow-sm">
+                                📋 복사
+                            </button>
+                        </div>
+                        <button id="clearBtn" class="text-xs text-rose-500 hover:underline">
+                            전체 지우기
+                        </button>
+                    </div>
+
+                    <!-- 텍스트 입력창 -->
+                    <textarea id="textInput" rows="14"
+                        class="w-full p-2 bg-transparent focus:outline-none resize-y text-slate-800 dark:text-slate-100 placeholder-slate-400 text-sm leading-relaxed flex-grow"
+                        placeholder="텍스트를 입력하거나 붙여넣으세요..."></textarea>
+                </div>
+            </div>
+
+            <!-- 우측 통계 대시보드 영역 (5열) -->
+            <div class="lg:col-span-5 flex flex-col gap-4">
+
+                <!-- 1. 핵심 카운트 카드 -->
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm">
+                    <h2
+                        class="text-xs font-bold text-excel-900 dark:text-emerald-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-excel-900 dark:bg-emerald-400"></span> 텍스트 요약
+                    </h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div
+                            class="bg-slate-50 dark:bg-slate-800/80 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+                            <div class="text-xs text-slate-500 dark:text-slate-400 mb-0.5">공백 포함</div>
+                            <div id="charCountWithSpace"
+                                class="text-2xl font-bold text-excel-900 dark:text-emerald-400">0</div>
+                        </div>
+                        <div
+                            class="bg-slate-50 dark:bg-slate-800/80 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+                            <div class="text-xs text-slate-500 dark:text-slate-400 mb-0.5">공백 제외</div>
+                            <div id="charCountNoSpace" class="text-2xl font-bold text-slate-800 dark:text-slate-100">0
+                            </div>
+                        </div>
+                        <div
+                            class="bg-slate-50 dark:bg-slate-800/80 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+                            <div class="text-xs text-slate-500 dark:text-slate-400 mb-0.5">단어 수</div>
+                            <div id="wordCount" class="text-lg font-bold text-slate-700 dark:text-slate-200">0</div>
+                        </div>
+                        <div
+                            class="bg-slate-50 dark:bg-slate-800/80 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+                            <div class="text-xs text-slate-500 dark:text-slate-400 mb-0.5">문장 수</div>
+                            <div id="sentenceCount" class="text-lg font-bold text-slate-700 dark:text-slate-200">0</div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/80 flex justify-between text-xs text-slate-600 dark:text-slate-300">
+                        <div>UTF-8: <span id="utf8Byte"
+                                class="font-semibold text-excel-900 dark:text-emerald-400">0</span> B</div>
+                        <div>EUC-KR: <span id="euckrByte"
+                                class="font-semibold text-excel-900 dark:text-emerald-400">0</span> B</div>
+                    </div>
+                </div>
+
+                <!-- 2. 플랫폼별 프로그레스 바 (인스타그램 포함) -->
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm flex-grow">
+                    <h2 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
+                        📊 주요 플랫폼 제한
+                    </h2>
+                    <div class="space-y-3 text-xs">
+                        <!-- 인스타그램 -->
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="font-medium text-slate-700 dark:text-slate-300">인스타그램 (피드본문 2,200자)</span>
+                                <span id="instaLimit" class="text-slate-400">0 / 2,200자</span>
+                            </div>
+                            <div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                                <div id="instaBar" class="bg-pink-600 h-full transition-all duration-200"
+                                    style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <!-- 트위터 -->
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="font-medium text-slate-700 dark:text-slate-300">X (Twitter - 280자)</span>
+                                <span id="twitterLimit" class="text-slate-400">0 / 280자</span>
+                            </div>
+                            <div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                                <div id="twitterBar"
+                                    class="bg-excel-900 dark:bg-emerald-400 h-full transition-all duration-200"
+                                    style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <!-- 자소서 500자 -->
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="font-medium text-slate-700 dark:text-slate-300">자소서 (500자 문항)</span>
+                                <span id="resume500Limit" class="text-slate-400">0 / 500자</span>
+                            </div>
+                            <div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                                <div id="resume500Bar"
+                                    class="bg-emerald-600 dark:bg-emerald-500 h-full transition-all duration-200"
+                                    style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <!-- 자소서 1000자 -->
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="font-medium text-slate-700 dark:text-slate-300">자소서 (1,000자 문항)</span>
+                                <span id="resume1000Limit" class="text-slate-400">0 / 1,000자</span>
+                            </div>
+                            <div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                                <div id="resume1000Bar"
+                                    class="bg-teal-600 dark:bg-teal-400 h-full transition-all duration-200"
+                                    style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- [추가] 사용법 및 안내 가이드 섹션 (메인 하단 배치) -->
+        <div
+            class="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+
+            <!-- 사용법 안내 -->
+            <div
+                class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h3
+                    class="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base mb-3 flex items-center gap-1.5">
+                    💡 이용 안내 및 주요 기능
+                </h3>
+                <ul class="space-y-2 list-disc list-inside leading-relaxed">
+                    <li><strong class="text-slate-800 dark:text-slate-200">실시간 자동 계산:</strong> 텍스트를 입력하거나 붙여넣으면 공백 포함/제외
+                        글자수가 즉시 계산됩니다.</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">플랫폼 제한 가이드:</strong> 인스타그램(2,200자),
+                        X/트위터(280자), 자기소개서(500자/1,000자)의 분량 기준을 한눈에 파악할 수 있습니다.</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">공백 정리:</strong> <code
+                            class="px-1 py-0.5 bg-slate-100 dark:bg-slate-700 rounded">🧹 공백정리</code> 버튼을 누르면 불필요하게 중복된
+                        띄어쓰기와 연속된 빈 줄을 한 번에 정돈해 줍니다.</li>
+                </ul>
+            </div>
+
+            <!-- 바이트(Byte) 계산 기준 안내 -->
+            <div
+                class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h3
+                    class="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base mb-3 flex items-center gap-1.5">
+                    🔒 보안 및 바이트(Byte) 계산 기준
+                </h3>
+                <ul class="space-y-2 list-disc list-inside leading-relaxed">
+                    <li><strong class="text-slate-800 dark:text-slate-200">100% 클라이언트 보안:</strong> 입력하신 모든 텍스트는 서버로 전송되지
+                        않으며, 사용자 브라우저 메모리 내에서만 처리되어 안전합니다.</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">UTF-8 바이트:</strong> 한글 3Byte, 영문/숫자/특수문자/공백
+                        1Byte로 계산됩니다. (웹/데이터베이스 표준)</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">EUC-KR 바이트:</strong> 한글 2Byte, 영문/숫자/특수문자/공백
+                        1Byte로 계산됩니다. (기업 자소서, 공공기관 시스템 기준)</li>
+                </ul>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- 하단 푸터 -->
+    <footer
+        class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-3 text-center text-xs text-slate-400">
+        © Smart Toolkit. All data processing happens on client side.
+    </footer>
+
+    <!-- 자바스크립트 로직 -->
+    <script>
+        const textInput = document.getElementById('textInput');
+        const charCountWithSpace = document.getElementById('charCountWithSpace');
+        const charCountNoSpace = document.getElementById('charCountNoSpace');
+        const wordCount = document.getElementById('wordCount');
+        const sentenceCount = document.getElementById('sentenceCount');
+        const utf8Byte = document.getElementById('utf8Byte');
+        const euckrByte = document.getElementById('euckrByte');
+
+        const clearBtn = document.getElementById('clearBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const formatTrimBtn = document.getElementById('formatTrimBtn');
+
+        const instaLimit = document.getElementById('instaLimit');
+        const instaBar = document.getElementById('instaBar');
+        const twitterLimit = document.getElementById('twitterLimit');
+        const twitterBar = document.getElementById('twitterBar');
+        const resume500Limit = document.getElementById('resume500Limit');
+        const resume500Bar = document.getElementById('resume500Bar');
+        const resume1000Limit = document.getElementById('resume1000Limit');
+        const resume1000Bar = document.getElementById('resume1000Bar');
+
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const htmlElement = document.documentElement;
+
+        // 다크모드
+        darkModeToggle.addEventListener('click', () => {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        });
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+        } else {
+            htmlElement.classList.remove('dark');
+        }
+
+        function getEucKrByte(str) {
+            let b = 0;
+            for (let i = 0; i < str.length; i++) {
+                let c = str.charCodeAt(i);
+                if (c > 127) { b += 2; } else { b += 1; }
+            }
+            return b;
+        }
+
+        function getUtf8Byte(str) {
+            return new TextEncoder().encode(str).length;
+        }
+
+        function updateCounts() {
+            const text = textInput.value;
+            const len = text.length;
+
+            charCountWithSpace.textContent = len.toLocaleString();
+            const noSpaceText = text.replace(/\s/g, '');
+            charCountNoSpace.textContent = noSpaceText.length.toLocaleString();
+
+            const words = text.trim() === '' ? [] : text.trim().split(/\s+/);
+            wordCount.textContent = words.length.toLocaleString();
+
+            const sentences = text.trim() === '' ? [] : text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            sentenceCount.textContent = sentences.length.toLocaleString();
+
+            utf8Byte.textContent = getUtf8Byte(text).toLocaleString();
+            euckrByte.textContent = getEucKrByte(text).toLocaleString();
+
+            updateProgress(len, 2200, instaLimit, instaBar, 'pink');
+            updateProgress(len, 280, twitterLimit, twitterBar, 'excel');
+            updateProgress(len, 500, resume500Limit, resume500Bar, 'emerald');
+            updateProgress(len, 1000, resume1000Limit, resume1000Bar, 'teal');
+        }
+
+        function updateProgress(current, max, labelEl, barEl, type) {
+            labelEl.textContent = `${current.toLocaleString()} / ${max.toLocaleString()}자`;
+            let percent = (current / max) * 100;
+            if (percent > 100) percent = 100;
+            barEl.style.width = `${percent}%`;
+
+            if (current > max) {
+                barEl.className = 'h-full transition-all duration-200 bg-rose-500';
+            } else {
+                if (type === 'pink') barEl.className = 'h-full transition-all duration-200 bg-pink-600';
+                else if (type === 'excel') barEl.className = 'h-full transition-all duration-200 bg-excel-900 dark:bg-emerald-400';
+                else if (type === 'emerald') barEl.className = 'h-full transition-all duration-200 bg-emerald-600 dark:bg-emerald-500';
+                else barEl.className = 'h-full transition-all duration-200 bg-teal-600 dark:bg-teal-400';
+            }
+        }
+
+        textInput.addEventListener('input', updateCounts);
+
+        clearBtn.addEventListener('click', () => {
+            textInput.value = '';
+            updateCounts();
+            textInput.focus();
+        });
+
+        copyBtn.addEventListener('click', () => {
+            if (!textInput.value) return;
+            navigator.clipboard.writeText(textInput.value).then(() => {
+                alert('클립보드에 복사되었습니다!');
+            });
+        });
+
+        formatTrimBtn.addEventListener('click', () => {
+            let val = textInput.value;
+            val = val.replace(/[ \t]+/g, ' ').replace(/\n\s*\n/g, '\n\n').trim();
+            textInput.value = val;
+            updateCounts();
+        });
+    </script>
+</body>
+
+</html>

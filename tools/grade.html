@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ko" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고등학교 내신 등급 계산기 - 스마트 툴킷</title>
+    <!-- Pretendard 폰트 -->
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Pretendard', 'sans-serif'] },
+                    colors: {
+                        excel: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#107c41', // Microsoft Excel 딥그린
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col justify-between transition-colors duration-200">
+
+    <!-- 상단 헤더 -->
+    <header
+        class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 py-3.5 px-6 shadow-sm sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="../index.html"
+                    class="text-lg font-bold text-excel-900 dark:text-emerald-400 flex items-center gap-2">
+                    <span
+                        class="w-7 h-7 bg-excel-900 text-white rounded-md flex items-center justify-center text-xs font-black shadow-sm">X</span>
+                    <span>스마트 툴킷</span>
+                </a>
+                <span
+                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    🔒 100% 브라우저 보안 처리
+                </span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- 다크모드 토글 버튼 -->
+                <button id="darkModeToggle"
+                    class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
+                    <svg id="sunIcon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <svg id="moonIcon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="max-w-5xl w-full mx-auto p-4 sm:p-6 my-4 flex-grow">
+
+        <!-- 타이틀 섹션 -->
+        <div
+            class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span
+                        class="px-2 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 rounded">#10대필수</span>
+                    <span
+                        class="px-2 py-0.5 text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 rounded">학업·수시</span>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    고등학교 내신 등급 산출기 (교육부 표준)
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-0.5">동석차 및 이수자 수를 반영한 교육부 지침 표준 공식으로
+                    평균 내신을 정밀 산출합니다.</p>
+            </div>
+
+            <!-- 모드 선택 탭 -->
+            <div class="flex bg-slate-200 dark:bg-slate-700 p-1 rounded-lg text-xs font-medium">
+                <button id="modeQuick"
+                    class="px-3 py-1.5 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm transition">등급
+                    직접 입력</button>
+                <button id="modeDetail"
+                    class="px-3 py-1.5 rounded-md text-slate-600 dark:text-slate-300 transition">석차·이수자 자동산출</button>
+            </div>
+        </div>
+
+        <!-- 2열 레이아웃 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- 좌측 메인 과목 입력 테이블 (7열) -->
+            <div class="lg:col-span-7 flex flex-col">
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-4 flex-grow flex flex-col">
+
+                    <!-- 툴바 영역 -->
+                    <div
+                        class="flex justify-between items-center mb-3 pb-3 border-b border-slate-100 dark:border-slate-700/60">
+                        <span id="tableTitle"
+                            class="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                            📚 과목별 성적 입력 (직접 선택 모드)
+                        </span>
+                        <div class="flex gap-2">
+                            <button id="addRowBtn"
+                                class="px-3 py-1.5 bg-excel-900 text-white hover:bg-excel-800 text-xs font-medium rounded-md transition shadow-sm flex items-center gap-1">
+                                ➕ 과목 추가
+                            </button>
+                            <button id="resetBtn"
+                                class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-xs font-medium rounded-md transition text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600">
+                                초기화
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 입력 테이블 -->
+                    <div class="overflow-x-auto flex-grow">
+                        <table class="w-full text-left text-xs text-slate-700 dark:text-slate-200">
+                            <thead>
+                                <tr id="tableHeader"
+                                    class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-700">
+                                    <th class="p-2 w-1/3">과목명</th>
+                                    <th class="p-2 w-1/5 text-center">단위수</th>
+                                    <th class="p-2 w-1/4 text-center">석차 등급</th>
+                                    <th class="p-2 w-16 text-center">삭제</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subjectTbody" class="divide-y divide-slate-100 dark:divide-slate-700/60">
+                                <!-- 자바스크립트로 동적 행 생성 -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 text-xs text-slate-400">
+                        * 예체능/성취도(A·B·C) 과목은 석차등급 산출에서 제외되므로 단위수 계산 시 유의하세요.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 우측 통계 및 요약 대시보드 (5열) -->
+            <div class="lg:col-span-5 flex flex-col gap-4">
+
+                <!-- 1. 평균 등급 결과 카드 -->
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm text-center">
+                    <h2 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+                        🎯 최종 평균 내신 등급
+                    </h2>
+                    <div id="averageGrade" class="text-4xl font-extrabold text-excel-900 dark:text-emerald-400 my-2">
+                        - 등급
+                    </div>
+                    <p id="gradeEvaluation" class="text-xs text-slate-500 dark:text-slate-400">
+                        과목 정보와 단위수를 입력해 주세요.
+                    </p>
+
+                    <div
+                        class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 text-left">
+                        <div
+                            class="bg-slate-50 dark:bg-slate-800/80 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+                            <div class="text-xs text-slate-500 dark:text-slate-400 mb-0.5">총 이수 단위수</div>
+                            <div id="totalUnits" class="text-lg font-bold text-slate-800 dark:text-slate-100">0 단위</div>
+                        </div>
+                        <div
+                            class="bg-slate-50 dark:bg-slate-800/80 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+                            <div class="text-xs text-slate-500 dark:text-slate-400 mb-0.5">총 과목 수</div>
+                            <div id="totalSubjects" class="text-lg font-bold text-slate-800 dark:text-slate-100">0 과목
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 석차등급 비율 가이드 카드 -->
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm flex-grow">
+                    <h2 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
+                        📊 9등급제 석차 누적 비율 기준
+                    </h2>
+                    <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                        <div
+                            class="p-2 bg-emerald-50 dark:bg-emerald-950/40 rounded border border-emerald-100 dark:border-emerald-900/50">
+                            <span class="font-bold text-emerald-800 dark:text-emerald-300">1등급</span>
+                            <div class="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">상위 ~4%</div>
+                        </div>
+                        <div
+                            class="p-2 bg-slate-50 dark:bg-slate-800/80 rounded border border-slate-100 dark:border-slate-700">
+                            <span class="font-bold text-slate-700 dark:text-slate-300">2등급</span>
+                            <div class="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">~11%</div>
+                        </div>
+                        <div
+                            class="p-2 bg-slate-50 dark:bg-slate-800/80 rounded border border-slate-100 dark:border-slate-700">
+                            <span class="font-bold text-slate-700 dark:text-slate-300">3등급</span>
+                            <div class="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">~23%</div>
+                        </div>
+                        <div
+                            class="p-2 bg-slate-50 dark:bg-slate-800/80 rounded border border-slate-100 dark:border-slate-700">
+                            <span class="font-bold text-slate-700 dark:text-slate-300">4등급</span>
+                            <div class="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">~40%</div>
+                        </div>
+                        <div
+                            class="p-2 bg-slate-50 dark:bg-slate-800/80 rounded border border-slate-100 dark:border-slate-700">
+                            <span class="font-bold text-slate-700 dark:text-slate-300">5등급</span>
+                            <div class="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">~60%</div>
+                        </div>
+                        <div
+                            class="p-2 bg-slate-50 dark:bg-slate-800/80 rounded border border-slate-100 dark:border-slate-700">
+                            <span class="font-bold text-slate-700 dark:text-slate-300">6등급</span>
+                            <div class="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">~77%</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 하단 법정 근거 및 계산식 설명 섹션 (개선) -->
+        <div
+            class="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+
+            <div
+                class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h3
+                    class="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base mb-3 flex items-center gap-1.5">
+                    📐 교육부 표준 산식 및 동석차 처리 근거
+                </h3>
+                <ul class="space-y-2.5 list-disc list-inside leading-relaxed text-xs">
+                    <li>
+                        <strong class="text-slate-800 dark:text-slate-200">법적 근거:</strong>
+                        교육부 고시 「학교생활기록 작성 및 관리지침」 학업성적관리 지침
+                    </li>
+                    <li>
+                        <strong class="text-slate-800 dark:text-slate-200">평균 내신 산출 공식:</strong><br>
+                        <span
+                            class="inline-block bg-slate-100 dark:bg-slate-700/60 text-slate-800 dark:text-slate-200 px-2 py-1 rounded font-mono text-[11px] mt-1 ml-4 border border-slate-200 dark:border-slate-600">
+                            (과목별 [단위수 × 석차등급]의 총합) ÷ (총 이수 단위수)
+                        </span>
+                    </li>
+                    <li>
+                        <strong class="text-slate-800 dark:text-slate-200">동석차 중간석차 산식:</strong><br>
+                        <span
+                            class="inline-block bg-slate-100 dark:bg-slate-700/60 text-slate-800 dark:text-slate-200 px-2 py-1 rounded font-mono text-[11px] mt-1 ml-4 border border-slate-200 dark:border-slate-600">
+                            중간석차 = 석차 + [(동석차 인원 - 1) ÷ 2]
+                        </span>
+                        <p class="text-[11px] text-slate-400 mt-1 ml-4">
+                            * 석차·이수자 자동산출 모드에서는 위 중간석차로 백분율[(중간석차 ÷ 수강자수) × 100]을 구해 9등급제 구간을 정확히 판정합니다.
+                        </p>
+                    </li>
+                </ul>
+            </div>
+
+            <div
+                class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h3
+                    class="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base mb-3 flex items-center gap-1.5">
+                    🔒 보안 및 로컬스토리지 저장 안내
+                </h3>
+                <ul class="space-y-2 list-disc list-inside leading-relaxed text-xs">
+                    <li><strong class="text-slate-800 dark:text-slate-200">100% 클라이언트 처리:</strong> 모든 성적 계산은 사용자의 브라우저
+                        내부에서만 연산됩니다.</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">데이터 유지:</strong> 입력하신 성적표는 브라우저 메모리에 자동 저장되어
+                        재방문 시에도 유지됩니다.</li>
+                </ul>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- 하단 푸터 -->
+    <footer
+        class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-3 text-center text-xs text-slate-400">
+        © Smart Toolkit. All data processing happens on client side.
+    </footer>
+
+    <!-- 자바스크립트 로직 -->
+    <script>
+        let isDetailMode = false; // false: Quick (직접선택), true: Detail (석차/동석차/이수자)
+
+        const subjectTbody = document.getElementById('subjectTbody');
+        const addRowBtn = document.getElementById('addRowBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const tableHeader = document.getElementById('tableHeader');
+        const tableTitle = document.getElementById('tableTitle');
+
+        const modeQuick = document.getElementById('modeQuick');
+        const modeDetail = document.getElementById('modeDetail');
+
+        const averageGradeEl = document.getElementById('averageGrade');
+        const gradeEvaluationEl = document.getElementById('gradeEvaluation');
+        const totalUnitsEl = document.getElementById('totalUnits');
+        const totalSubjectsEl = document.getElementById('totalSubjects');
+
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const htmlElement = document.documentElement;
+
+        const defaultQuickSubjects = [
+            { name: '국어', unit: 4, grade: 2 },
+            { name: '수학', unit: 4, grade: 1 },
+            { name: '영어', unit: 4, grade: 2 },
+            { name: '한국사', unit: 2, grade: 1 },
+            { name: '통합사회', unit: 3, grade: 2 },
+            { name: '통합과학', unit: 3, grade: 3 },
+        ];
+
+        const defaultDetailSubjects = [
+            { name: '국어', unit: 4, rank: 5, tied: 1, total: 200 },
+            { name: '수학', unit: 4, rank: 2, tied: 2, total: 200 },
+            { name: '영어', unit: 4, rank: 10, tied: 1, total: 200 },
+        ];
+
+        darkModeToggle.addEventListener('click', () => {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        });
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+        } else {
+            htmlElement.classList.remove('dark');
+        }
+
+        // 모드 전환 버튼 이벤트
+        modeQuick.addEventListener('click', () => {
+            isDetailMode = false;
+            modeQuick.className = 'px-3 py-1.5 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm transition';
+            modeDetail.className = 'px-3 py-1.5 rounded-md text-slate-600 dark:text-slate-300 transition';
+            tableTitle.textContent = '📚 과목별 성적 입력 (직접 선택 모드)';
+            tableHeader.innerHTML = `
+                <th class="p-2 w-1/3">과목명</th>
+                <th class="p-2 w-1/5 text-center">단위수</th>
+                <th class="p-2 w-1/4 text-center">석차 등급</th>
+                <th class="p-2 w-16 text-center">삭제</th>
+            `;
+            initData();
+        });
+
+        modeDetail.addEventListener('click', () => {
+            isDetailMode = true;
+            modeDetail.className = 'px-3 py-1.5 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm transition';
+            modeQuick.className = 'px-3 py-1.5 rounded-md text-slate-600 dark:text-slate-300 transition';
+            tableTitle.textContent = '📚 과목별 성적 입력 (석차·이수자 자동산출 모드)';
+            tableHeader.innerHTML = `
+                <th class="p-2 w-1/4">과목명</th>
+                <th class="p-2 w-12 text-center">단위</th>
+                <th class="p-2 w-12 text-center">석차</th>
+                <th class="p-2 w-12 text-center">동석차</th>
+                <th class="p-2 w-14 text-center">수강자</th>
+                <th class="p-2 w-12 text-center">삭제</th>
+            `;
+            initData();
+        });
+
+        function initData() {
+            subjectTbody.innerHTML = '';
+            if (!isDetailMode) {
+                const saved = localStorage.getItem('grade_quick_data');
+                const subjects = saved ? JSON.parse(saved) : defaultQuickSubjects;
+                subjects.forEach(sub => addQuickRow(sub.name, sub.unit, sub.grade));
+            } else {
+                const saved = localStorage.getItem('grade_detail_data');
+                const subjects = saved ? JSON.parse(saved) : defaultDetailSubjects;
+                subjects.forEach(sub => addDetailRow(sub.name, sub.unit, sub.rank, sub.tied, sub.total));
+            }
+            calculateGrades();
+        }
+
+        // 1. 직접 선택 모드 행 추가
+        function addQuickRow(name = '', unit = 3, grade = 1) {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition';
+            tr.innerHTML = `
+                <td class="p-2">
+                    <input type="text" value="${name}" placeholder="과목명" class="subject-name w-full p-1.5 bg-transparent border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:border-excel-900 dark:focus:border-emerald-400">
+                </td>
+                <td class="p-2 text-center">
+                    <input type="number" value="${unit}" min="1" max="10" class="subject-unit w-16 p-1.5 text-center bg-transparent border border-slate-200 dark:border-slate-700 rounded focus:outline-none">
+                </td>
+                <td class="p-2 text-center">
+                    <select class="subject-grade w-20 p-1.5 text-center bg-transparent border border-slate-200 dark:border-slate-700 rounded focus:outline-none">
+                        ${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(g => `<option value="${g}" ${g == grade ? 'selected' : ''} class="dark:bg-slate-800">${g}등급</option>`).join('')}
+                    </select>
+                </td>
+                <td class="p-2 text-center">
+                    <button class="delete-btn text-rose-500 hover:text-rose-700 p-1">✕</button>
+                </td>
+            `;
+            subjectTbody.appendChild(tr);
+            tr.querySelectorAll('input, select').forEach(el => el.addEventListener('input', calculateGrades));
+            tr.querySelector('.delete-btn').addEventListener('click', () => { tr.remove(); calculateGrades(); });
+        }
+
+        // 2. 자동 산출 모드 행 추가 (석차/동석차/수강자)
+        function addDetailRow(name = '', unit = 3, rank = 1, tied = 1, total = 100) {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition';
+            tr.innerHTML = `
+                <td class="p-2">
+                    <input type="text" value="${name}" placeholder="과목명" class="subject-name w-full p-1.5 bg-transparent border border-slate-200 dark:border-slate-700 rounded focus:outline-none text-xs">
+                </td>
+                <td class="p-2 text-center">
+                    <input type="number" value="${unit}" min="1" max="10" class="subject-unit w-12 p-1.5 text-center bg-transparent border border-slate-200 dark:border-slate-700 rounded focus:outline-none text-xs">
+                </td>
+                <td class="p-2 text-center">
+                    <input type="number" value="${rank}" min="1" class="subject-rank w-12 p-1.5 text-center bg-transparent border border-slate-200 dark:border-slate-700 rounded focus:outline-none text-xs">
+                </td>
+                <td class="p-2 text-center">
+                    <input type="number" value="${tied}" min="1" class="subject-tied w-12 p-1.5 text-center bg-transparent border border-slate-200 dark:border-slate-700 rounded focus:outline-none text-xs" title="동석차 인원">
+                </td>
+                <td class="p-2 text-center">
+                    <input type="number" value="${total}" min="1" class="subject-total w-14 p-1.5 text-center bg-transparent border border-slate-200 dark:border-slate-700 rounded focus:outline-none text-xs" title="수강자 수">
+                </td>
+                <td class="p-2 text-center">
+                    <button class="delete-btn text-rose-500 hover:text-rose-700 p-1">✕</button>
+                </td>
+            `;
+            subjectTbody.appendChild(tr);
+            tr.querySelectorAll('input').forEach(el => el.addEventListener('input', calculateGrades));
+            tr.querySelector('.delete-btn').addEventListener('click', () => { tr.remove(); calculateGrades(); });
+        }
+
+        // 백분율 기반 등급 환산 함수
+        function getGradeFromPercentage(percent) {
+            if (percent <= 4.0) return 1;
+            if (percent <= 11.0) return 2;
+            if (percent <= 23.0) return 3;
+            if (percent <= 40.0) return 4;
+            if (percent <= 60.0) return 5;
+            if (percent <= 77.0) return 6;
+            if (percent <= 89.0) return 7;
+            if (percent <= 96.0) return 8;
+            return 9;
+        }
+
+        // 통합 등급 계산 로직
+        function calculateGrades() {
+            const rows = subjectTbody.querySelectorAll('tr');
+            let totalUnits = 0;
+            let weightedGradeSum = 0;
+            let validSubjectCount = 0;
+
+            const quickSaveData = [];
+            const detailSaveData = [];
+
+            rows.forEach(row => {
+                const name = row.querySelector('.subject-name').value.trim();
+                const unit = parseFloat(row.querySelector('.subject-unit').value) || 0;
+
+                if (!isDetailMode) {
+                    const grade = parseInt(row.querySelector('.subject-grade').value) || 1;
+                    if (unit > 0) {
+                        totalUnits += unit;
+                        weightedGradeSum += (unit * grade);
+                        validSubjectCount++;
+                    }
+                    quickSaveData.push({ name, unit, grade });
+                } else {
+                    const rank = parseFloat(row.querySelector('.subject-rank').value) || 1;
+                    const tied = parseFloat(row.querySelector('.subject-tied').value) || 1;
+                    const total = parseFloat(row.querySelector('.subject-total').value) || 100;
+
+                    if (unit > 0 && total > 0) {
+                        // 중간석차 산식: 석차 + (동석차인원 - 1) / 2
+                        const middleRank = rank + (tied - 1) / 2;
+                        const percentage = (middleRank / total) * 100;
+                        const calculatedGrade = getGradeFromPercentage(percentage);
+
+                        totalUnits += unit;
+                        weightedGradeSum += (unit * calculatedGrade);
+                        validSubjectCount++;
+                    }
+                    detailSaveData.push({ name, unit, rank, tied, total });
+                }
+            });
+
+            if (!isDetailMode) {
+                localStorage.setItem('grade_quick_data', JSON.stringify(quickSaveData));
+            } else {
+                localStorage.setItem('grade_detail_data', JSON.stringify(detailSaveData));
+            }
+
+            totalUnitsEl.textContent = `${totalUnits} 단위`;
+            totalSubjectsEl.textContent = `${validSubjectCount} 과목`;
+
+            if (totalUnits > 0) {
+                const avg = (weightedGradeSum / totalUnits).toFixed(2);
+                averageGradeEl.textContent = `${avg} 등급`;
+
+                if (avg <= 1.5) gradeEvaluationEl.textContent = '🌟 최상위권 성적입니다! 수시 종합/교과 전형에 매우 유리합니다.';
+                else if (avg <= 2.5) gradeEvaluationEl.textContent = '👍 상위권 성적입니다. 주요 대학 수시 지원을 노려보세요.';
+                else if (avg <= 3.5) gradeEvaluationEl.textContent = '📘 중상위권 성적입니다. 단위수가 높은 과목을 집중 관리하세요.';
+                else gradeEvaluationEl.textContent = '✏️ 차근차근 성적을 올려보세요. 단위수가 높은 과목이 핵심입니다.';
+            } else {
+                averageGradeEl.textContent = '- 등급';
+                gradeEvaluationEl.textContent = '과목 정보와 단위수를 입력해 주세요.';
+            }
+        }
+
+        addRowBtn.addEventListener('click', () => {
+            if (!isDetailMode) addQuickRow('', 3, 1);
+            else addDetailRow('', 3, 1, 1, 100);
+            calculateGrades();
+        });
+
+        resetBtn.addEventListener('click', () => {
+            if (confirm('모든 입력 내용을 초기화하시겠습니까?')) {
+                if (!isDetailMode) localStorage.removeItem('grade_quick_data');
+                else localStorage.removeItem('grade_detail_data');
+                initData();
+            }
+        });
+
+        initData();
+    </script>
+</body>
+
+</html>

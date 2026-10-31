@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ko" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>종합소득세 및 4대보험 간이 계산기 - 스마트 툴킷</title>
+    <!-- Pretendard 폰트 -->
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Pretendard', 'sans-serif'] },
+                    colors: {
+                        excel: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#107c41', // Microsoft Excel 딥그린
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col justify-between transition-colors duration-200">
+
+    <!-- 상단 헤더 -->
+    <header
+        class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 py-3.5 px-6 shadow-sm sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="../index.html"
+                    class="text-lg font-bold text-excel-900 dark:text-emerald-400 flex items-center gap-2">
+                    <span
+                        class="w-7 h-7 bg-excel-900 text-white rounded-md flex items-center justify-center text-xs font-black shadow-sm">X</span>
+                    <span>스마트 툴킷</span>
+                </a>
+                <span
+                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    🔒 100% 브라우저 보안 처리
+                </span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- 다크모드 토글 버튼 -->
+                <button id="darkModeToggle"
+                    class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
+                    <svg id="sunIcon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <svg id="moonIcon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="max-w-5xl w-full mx-auto p-4 sm:p-6 my-4 flex-grow">
+
+        <!-- 타이틀 섹션 -->
+        <div
+            class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span
+                        class="px-2 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 rounded">#40대필수</span>
+                    <span
+                        class="px-2 py-0.5 text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 rounded">투잡·세무</span>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    종합소득세 및 4대 보험 간이 계산기
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-0.5">근로소득 외 부수입(사업·프리랜서·복합)에 따른
+                    종합소득세 과세표준 및 예상 4대 보험료를 연쇄 산출합니다.</p>
+            </div>
+            <div class="text-xs text-slate-400 dark:text-slate-500">
+                소득세법 및 국민건강보험법 기준
+            </div>
+        </div>
+
+        <!-- 2열 레이아웃 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- 좌측 소득 입력 영역 (6열) -->
+            <div class="lg:col-span-6 flex flex-col">
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-5 flex-grow flex flex-col justify-between">
+
+                    <div class="space-y-4">
+                        <h2
+                            class="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider border-b border-slate-100 dark:border-slate-700/60 pb-2">
+                            💰 연간 소득 조건 입력
+                        </h2>
+
+                        <!-- 주된 소득 (근로소득) -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">본업 연간
+                                근로소득 (연봉 기준, 만원)</label>
+                            <div class="relative">
+                                <input type="number" id="salaryInput" value="5000" step="100"
+                                    class="w-full p-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-excel-900 dark:focus:border-emerald-400 pr-12 font-semibold">
+                                <span class="absolute right-3 top-2.5 text-xs text-slate-400">만원</span>
+                            </div>
+                            <div id="salaryKorean"
+                                class="text-[11px] text-excel-900 dark:text-emerald-400 mt-1 font-medium">5,000만원
+                            </div>
+                        </div>
+
+                        <!-- 부수입 (사업/프리랜서 소득) -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">투잡·부수입
+                                연간 총수입 (사업·프리랜서 총액, 만원)</label>
+                            <div class="relative">
+                                <input type="number" id="sideIncomeInput" value="1500" step="50"
+                                    class="w-full p-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-excel-900 dark:focus:border-emerald-400 pr-12 font-semibold">
+                                <span class="absolute right-3 top-2.5 text-xs text-slate-400">만원</span>
+                            </div>
+                            <div id="sideKorean"
+                                class="text-[11px] text-excel-900 dark:text-emerald-400 mt-1 font-medium">1,500만원
+                            </div>
+                        </div>
+
+                        <!-- 업종 선택 (대책 1: 복합 소득 옵션 추가) -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">부수입
+                                업종 및 소득 유형</label>
+                            <select id="businessType"
+                                class="w-full p-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-excel-900 dark:focus:border-emerald-400">
+                                <option value="mixed">🔄 복합 소득 (여러 부수입/업종이 섞여 있음 - 혼합경비율)</option>
+                                <option value="freelance">프리랜서 / 인적용역 (원천징수 3.3% - 경비율 약 60%)</option>
+                                <option value="service">도소매업 / 서비스업 (일반 사업소득 - 경비율 약 70%)</option>
+                                <option value="rental">임대업 / 기타 부수입 (경비율 약 50%)</option>
+                            </select>
+                            <p id="expenseGuide" class="text-[11px] text-slate-400 mt-1">
+                                * 복합 소득: 여러 형태의 부수입이 혼합된 경우 평균 인정 경비율(50%)을 적용합니다.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="mt-6 pt-3 border-t border-slate-100 dark:border-slate-700/60 text-[11px] text-slate-400">
+                        * 본 산식은 간이 추정용이며, 실제 신고 시 세무 대행 또는 국세청 홈택스 신고 내용을 기준으로 합니다.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 우측 산출 결과 대시보드 (6열) -->
+            <div class="lg:col-span-6 flex flex-col gap-4">
+
+                <!-- 1. 종합소득세 산출 카드 -->
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <h2
+                            class="text-xs font-bold text-excel-900 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-excel-900 dark:bg-emerald-400"></span> 예상 종합소득세
+                            (지방소득세 포함)
+                        </h2>
+                        <span id="taxRateBadge"
+                            class="text-[11px] bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">과세표준
+                            구간 15%</span>
+                    </div>
+                    <div id="totalTaxResult" class="text-3xl font-extrabold text-slate-900 dark:text-white my-1">
+                        142 만원
+                    </div>
+                    <p class="text-[11px] text-slate-400">기납부 원천징수세액 차감 전 예상 산출 세액 기준</p>
+                </div>
+
+                <!-- 2. 추가 4대 보험료 산출 카드 -->
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <h2
+                            class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                            🛡️ 투잡 추가 건강보험료 (소득월액보험료)
+                        </h2>
+                        <span
+                            class="text-[11px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-2 py-0.5 rounded font-medium">연간
+                            보수외 소득 연동</span>
+                    </div>
+                    <div id="extraInsuranceResult"
+                        class="text-3xl font-extrabold text-excel-900 dark:text-emerald-400 my-1">
+                        0 만원 <span class="text-xs text-slate-400 font-normal">(연간 추가 부담)</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-1">※ 직장인 투잡 시 연간 보수외 소득이 2,000만원을 초과하는 경우 건강보험료가 추가
+                        부과됩니다.</p>
+                </div>
+
+                <!-- 3. 총 세금 및 보험료 합계 요약 -->
+                <div
+                    class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/50 rounded-xl p-4 shadow-sm flex justify-between items-center">
+                    <div>
+                        <div class="text-xs text-emerald-800 dark:text-emerald-300 font-semibold">총 추가 부담 예상액</div>
+                        <div class="text-[11px] text-emerald-600 dark:text-emerald-400">(종합소득세 + 추가 건강보험료 합산)</div>
+                    </div>
+                    <div id="totalBurdenResult" class="text-xl font-black text-excel-900 dark:text-emerald-300">
+                        142 만원
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 하단 법정 근거 및 산식 안내 섹션 (대책 3: 가이드 보완) -->
+        <div
+            class="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+
+            <div
+                class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h3
+                    class="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base mb-3 flex items-center gap-1.5">
+                    📜 종합소득세 법적 근거 및 누진세율
+                </h3>
+                <ul class="space-y-2 list-disc list-inside leading-relaxed text-xs">
+                    <li><strong class="text-slate-800 dark:text-slate-200">법적 근거:</strong> 「소득세법」 제55조 (세율) 및 제70조
+                        (종합소득세 확정신고)</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">과세표준 구간:</strong> 1,400만 이하(6%), 5,000만
+                        이하(15%), 8,800만 이하(24%), 1.5억 이하(35%) 등 초과누진세율 적용</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">지방소득세:</strong> 산출 소득세의 10%가 지방소득세로 함께 부과
+                    </li>
+                    <li class="pt-1 text-emerald-800 dark:text-emerald-400 font-medium">
+                        ※ 업종별 필요경비율 차이: 동일 수입이라도 국세청 업종별 인정 필요경비율(프리랜서 약 60%, 도소매 약 70%, 임대업 약 50%)에 따라 순소득(과세표준)이
+                        달라지며, 복합 소득의 경우 각 소득금액이 개별 합산됩니다.
+                    </li>
+                </ul>
+            </div>
+
+            <div
+                class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h3
+                    class="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base mb-3 flex items-center gap-1.5">
+                    🛡️ 4대 보험 (보수외 소득) 산식 안내
+                </h3>
+                <ul class="space-y-2 list-disc list-inside leading-relaxed text-xs">
+                    <li><strong class="text-slate-800 dark:text-slate-200">법적 근거:</strong> 「국민건강보험법」 제69조 및 시행령 제32조
+                    </li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">보수외 소득 기준:</strong> 직장 가입자의 연간 보수외
+                        소득(사업·임대 등)이 연간 2,000만원을 초과하는 경우 초과분에 대해 건강보험료가 별도 부과됩니다.</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">국민연금:</strong> 사업소득자의 경우 기준소득월액의 9%가 본인
+                        부담으로 부과됩니다.</li>
+                </ul>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- 하단 푸터 -->
+    <footer
+        class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-3 text-center text-xs text-slate-400">
+        © Smart Toolkit. All data processing happens on client side.
+    </footer>
+
+    <!-- 자바스크립트 계산 로직 -->
+    <script>
+        const salaryInput = document.getElementById('salaryInput');
+        const salaryKorean = document.getElementById('salaryKorean');
+        const sideIncomeInput = document.getElementById('sideIncomeInput');
+        const sideKorean = document.getElementById('sideKorean');
+        const businessType = document.getElementById('businessType');
+        const expenseGuide = document.getElementById('expenseGuide');
+
+        const totalTaxResult = document.getElementById('totalTaxResult');
+        const taxRateBadge = document.getElementById('taxRateBadge');
+        const extraInsuranceResult = document.getElementById('extraInsuranceResult');
+        const totalBurdenResult = document.getElementById('totalBurdenResult');
+
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const htmlElement = document.documentElement;
+
+        darkModeToggle.addEventListener('click', () => {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        });
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+        } else {
+            htmlElement.classList.remove('dark');
+        }
+
+        function formatKoreanMoney(manWon) {
+            if (!manWon || manWon <= 0) return '0원';
+            const uk = Math.floor(manWon / 10000);
+            const rest = manWon % 10000;
+            let str = '';
+            if (uk > 0) str += `${uk}억 `;
+            if (rest > 0) str += `${rest.toLocaleString()}만`;
+            return str + '원';
+        }
+
+        function calculateTaxAndInsurance() {
+            const salary = (parseFloat(salaryInput.value) || 0) * 10000; // 원 단위
+            const sideIncome = (parseFloat(sideIncomeInput.value) || 0) * 10000; // 원 단위
+
+            salaryKorean.textContent = formatKoreanMoney(salary / 10000);
+            sideKorean.textContent = formatKoreanMoney(sideIncome / 10000);
+
+            // 업종별 경비율 반영
+            const type = businessType.value;
+            let expenseRate = 0.5; // 기본 mixed (50%)
+
+            if (type === 'mixed') {
+                expenseRate = 0.5;
+                expenseGuide.textContent = '* 복합 소득: 여러 형태의 부수입이 혼합된 경우 평균 인정 경비율(50%)을 적용합니다.';
+            } else if (type === 'freelance') {
+                expenseRate = 0.6;
+                expenseGuide.textContent = '* 프리랜서/3.3%: 인적용역 표준 경비율 약 60%를 인정 적용합니다.';
+            } else if (type === 'service') {
+                expenseRate = 0.7;
+                expenseGuide.textContent = '* 도소매/서비스: 일반 사업소득 표준 경비율 약 70%를 인정 적용합니다.';
+            } else if (type === 'rental') {
+                expenseRate = 0.5;
+                expenseGuide.textContent = '* 임대업/기타: 부동산 임대 및 기타 소득 경비율 약 50%를 인정 적용합니다.';
+            }
+
+            // 필요경비 차감 후 사업소득금액 (순소득)
+            const netSideIncome = sideIncome * (1 - expenseRate);
+
+            // 근로소득공제 간이 적용
+            let earnedIncomeDeduction = salary * 0.4;
+            if (salary > 15000000) earnedIncomeDeduction = 6000000 + (salary - 15000000) * 0.15;
+            const netSalary = Math.max(0, salary - earnedIncomeDeduction);
+
+            // 종합소득 과세표준 (근로소득 + 사업소득금액 합산 - 기본공제 150만 가정)
+            const totalTaxBase = Math.max(0, netSalary + netSideIncome - 1500000);
+
+            // 종합소득세 산출세율 (소득세법 제55조 누진세율)
+            let calculatedTax = 0;
+            let marginalRate = 0.06;
+
+            if (totalTaxBase <= 14000000) {
+                calculatedTax = totalTaxBase * 0.06;
+                marginalRate = 0.06;
+            } else if (totalTaxBase <= 50000000) {
+                calculatedTax = 840000 + (totalTaxBase - 14000000) * 0.15;
+                marginalRate = 0.15;
+            } else if (totalTaxBase <= 88000000) {
+                calculatedTax = 6240000 + (totalTaxBase - 50000000) * 0.24;
+                marginalRate = 0.24;
+            } else if (totalTaxBase <= 150000000) {
+                calculatedTax = 15360000 + (totalTaxBase - 88000000) * 0.35;
+                marginalRate = 0.35;
+            } else {
+                calculatedTax = 37060000 + (totalTaxBase - 150000000) * 0.38;
+                marginalRate = 0.38;
+            }
+
+            // 지방소득세(10%) 합산
+            const totalTaxWithLocal = Math.floor(calculatedTax * 1.1 / 10000); // 만원 단위
+
+            taxRateBadge.textContent = `과세표준 구간 ${(marginalRate * 100)}%`;
+            totalTaxResult.textContent = `${totalTaxWithLocal.toLocaleString()} 만원`;
+
+            // 건강보험 보수외 소득 부과 (연간 2,000만원 초과분 기준, 건강보험료율 약 7.09%)
+            let extraHealthIns = 0;
+            if (sideIncome > 20000000) {
+                const excess = sideIncome - 20000000;
+                extraHealthIns = Math.floor((excess * 0.0709) / 10000);
+            }
+
+            extraInsuranceResult.textContent = `${extraHealthIns.toLocaleString()} 만원`;
+
+            const grandTotal = totalTaxWithLocal + extraHealthIns;
+            totalBurdenResult.textContent = `${grandTotal.toLocaleString()} 만원`;
+        }
+
+        salaryInput.addEventListener('input', calculateTaxAndInsurance);
+        sideIncomeInput.addEventListener('input', calculateTaxAndInsurance);
+        businessType.addEventListener('change', calculateTaxAndInsurance);
+
+        calculateTaxAndInsurance();
+    </script>
+</body>
+
+</html>

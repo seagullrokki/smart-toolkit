@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ko" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부동산 원스톱 계산기 - 스마트 툴킷</title>
+    <!-- Pretendard 폰트 -->
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Pretendard', 'sans-serif'] },
+                    colors: {
+                        excel: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#107c41', // Microsoft Excel 딥그린
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col justify-between transition-colors duration-200">
+
+    <!-- 상단 헤더 -->
+    <header
+        class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 py-3.5 px-6 shadow-sm sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="../index.html"
+                    class="text-lg font-bold text-excel-900 dark:text-emerald-400 flex items-center gap-2">
+                    <span
+                        class="w-7 h-7 bg-excel-900 text-white rounded-md flex items-center justify-center text-xs font-black shadow-sm">X</span>
+                    <span>스마트 툴킷</span>
+                </a>
+                <span
+                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    🔒 100% 브라우저 보안 처리
+                </span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- 다크모드 토글 버튼 -->
+                <button id="darkModeToggle"
+                    class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
+                    <svg id="sunIcon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <svg id="moonIcon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="max-w-5xl w-full mx-auto p-4 sm:p-6 my-4 flex-grow">
+
+        <!-- 타이틀 섹션 -->
+        <div
+            class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span
+                        class="px-2 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 rounded">#30대필수</span>
+                    <span
+                        class="px-2 py-0.5 text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 rounded">내집마련·부동산</span>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    부동산 원스톱 계산기 (중개보수 + 취득세)
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-0.5">공인중개사법 및 지방세법 근거로 법정 중개보수 상한선과
+                    취득세를 연쇄 산출합니다.</p>
+            </div>
+            <div class="text-xs text-slate-400 dark:text-slate-500">
+                국토교통부 표준 요율 법률 기준
+            </div>
+        </div>
+
+        <!-- 2열 레이아웃 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- 좌측 매매/임대 조건 입력 영역 (6열) -->
+            <div class="lg:col-span-6 flex flex-col">
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-5 flex-grow flex flex-col justify-between">
+
+                    <div class="space-y-4">
+                        <h2
+                            class="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider border-b border-slate-100 dark:border-slate-700/60 pb-2">
+                            🏡 거래 조건 설정
+                        </h2>
+
+                        <!-- 거래 종류 -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">거래
+                                유형</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button type="button" id="typeTrade"
+                                    class="type-btn active px-3 py-2 text-xs font-medium rounded-md border border-excel-900 bg-excel-900 text-white dark:border-emerald-400 dark:bg-emerald-950 dark:text-emerald-300">매매/교환</button>
+                                <button type="button" id="typeDeposit"
+                                    class="type-btn px-3 py-2 text-xs font-medium rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300">전세</button>
+                                <button type="button" id="typeRent"
+                                    class="type-btn px-3 py-2 text-xs font-medium rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300">월세</button>
+                            </div>
+                        </div>
+
+                        <!-- 부동산 종류 -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">부동산
+                                유형</label>
+                            <select id="propertyType"
+                                class="w-full p-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-excel-900 dark:focus:border-emerald-400">
+                                <option value="house">주택 / 아파트 / 빌라</option>
+                                <option value="officetel">주거용 오피스텔 (전용 85㎡ 이하)</option>
+                                <option value="land">토지 / 상가 / 기타 (주택 외)</option>
+                            </select>
+                        </div>
+
+                        <!-- 거래 금액 입력 -->
+                        <div>
+                            <label id="priceLabel"
+                                class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">매매가
+                                (만원)</label>
+                            <div class="relative">
+                                <input type="number" id="priceInput" value="60000" step="100"
+                                    class="w-full p-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-excel-900 dark:focus:border-emerald-400 pr-12 font-semibold">
+                                <span class="absolute right-3 top-2.5 text-xs text-slate-400">만원</span>
+                            </div>
+                            <div id="priceKorean"
+                                class="text-[11px] text-excel-900 dark:text-emerald-400 mt-1 font-medium">6억원</div>
+                        </div>
+
+                        <!-- 월세 입력창 (월세 선택시에만 표시) -->
+                        <div id="monthlyDiv" class="hidden">
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">보증금 / 월세
+                                (만원)</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="number" id="depositInput" value="5000"
+                                    class="p-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none"
+                                    placeholder="보증금">
+                                <input type="number" id="monthlyInput" value="50"
+                                    class="p-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none"
+                                    placeholder="월세액">
+                            </div>
+                        </div>
+
+                        <!-- 주택 수 조건 (취득세 계산용) -->
+                        <div id="houseCountDiv">
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">보유 주택 수
+                                (취득세율 결정)</label>
+                            <select id="houseCount"
+                                class="w-full p-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-excel-900 dark:focus:border-emerald-400">
+                                <option value="1">1주택 (무주택자 내집마련 포함)</option>
+                                <option value="2">2주택 (조정/비조정지역 구분에 따름)</option>
+                                <option value="3">3주택 이상 (중과세율 적용)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div
+                        class="mt-6 pt-3 border-t border-slate-100 dark:border-slate-700/60 text-[11px] text-slate-400">
+                        * 부가가치세(10%) 별도 금액 기준이며 협의를 통해 법정 상한 요율 내에서 결정됩니다.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 우측 산출 결과 대시보드 (6열) -->
+            <div class="lg:col-span-6 flex flex-col gap-4">
+
+                <!-- 1. 중개보수(복비) 산출 카드 -->
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <h2
+                            class="text-xs font-bold text-excel-900 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-excel-900 dark:bg-emerald-400"></span> 중개보수 (법정 상한)
+                        </h2>
+                        <span id="brokerRateBadge"
+                            class="text-[11px] bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">상한요율
+                            0.4%</span>
+                    </div>
+                    <div id="brokerFeeResult" class="text-3xl font-extrabold text-slate-900 dark:text-white my-1">
+                        240 만원
+                    </div>
+                    <p class="text-[11px] text-slate-400">부가가치세(VAT 10%) 포함 최대 <span id="brokerFeeVat">264만원</span></p>
+                </div>
+
+                <!-- 2. 취득세 산출 카드 -->
+                <div id="taxCard"
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <h2
+                            class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                            🏛️ 취득세 및 지방교육세
+                        </h2>
+                        <span id="taxRateBadge"
+                            class="text-[11px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-2 py-0.5 rounded font-medium">세율
+                            1.1%</span>
+                    </div>
+                    <div id="acquisitionTaxResult"
+                        class="text-3xl font-extrabold text-excel-900 dark:text-emerald-400 my-1">
+                        660 만원
+                    </div>
+                    <div
+                        class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/80 grid grid-cols-2 text-xs text-slate-600 dark:text-slate-300">
+                        <div>취득세: <span id="pureTax"
+                                class="font-semibold text-slate-800 dark:text-slate-100">600만원</span></div>
+                        <div>지방교육세: <span id="eduTax"
+                                class="font-semibold text-slate-800 dark:text-slate-100">60만원</span></div>
+                    </div>
+                </div>
+
+                <!-- 3. 부대비용 합계 요약 -->
+                <div
+                    class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/50 rounded-xl p-4 shadow-sm flex justify-between items-center">
+                    <div>
+                        <div class="text-xs text-emerald-800 dark:text-emerald-300 font-semibold">부대비용 예상 합계</div>
+                        <div class="text-[11px] text-emerald-600 dark:text-emerald-400">(중개보수 + 취득세 총액)</div>
+                    </div>
+                    <div id="totalExtraCost" class="text-xl font-black text-excel-900 dark:text-emerald-300">
+                        900 만원
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 하단 법정 근거 및 요율 출처 안내 섹션 -->
+        <div
+            class="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+
+            <div
+                class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h3
+                    class="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base mb-3 flex items-center gap-1.5">
+                    📜 중개보수 법적 출처 및 법령 기준
+                </h3>
+                <ul class="space-y-2 list-disc list-inside leading-relaxed text-xs">
+                    <li><strong class="text-slate-800 dark:text-slate-200">법적 근거:</strong> 「공인중개사법」 제32조 및 「공인중개사법 시행규칙」
+                        제20조</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">주택 매매 상한요율:</strong> 6억 미만(0.4%),
+                        6억~9억(0.4%), 9억~12억(0.5%), 12억 이상(0.6% 이내)</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">주택 임대차 상한요율:</strong> 1억~9억 미만(0.3%),
+                        9억~12억(0.4%), 12억 이상(0.5% 이내)</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">오피스텔 요율 (시행규칙 제20조 4항):</strong> 전용 85㎡ 이하
+                        주거용 기준 <strong>매매 0.5% / 임대차 0.4%</strong> 고정 상한 적용</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">지역별 통일성:</strong> 국토교통부 개정 표준안에 따라 서울·수도권 및
+                        지방 17개 시·도 조례 공통 적용</li>
+                </ul>
+            </div>
+
+            <div
+                class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h3
+                    class="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base mb-3 flex items-center gap-1.5">
+                    🏛️ 취득세 법적 출처 및 산식
+                </h3>
+                <ul class="space-y-2 list-disc list-inside leading-relaxed text-xs">
+                    <li><strong class="text-slate-800 dark:text-slate-200">법적 근거:</strong> 「지방세법」 제11조(부동산 취득의 세율) 및
+                        제151조(지방교육세)</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">1주택자 취득세율:</strong> 6억 이하(1%), 6억~9억 이하(사다리
+                        비율 공식), 9억 초과(3%)</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">6억~9억 구간 산식:</strong> 취득세율(%) = [취득가액(원) ×
+                        2/3억 - 3] / 100</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">지방교육세:</strong> 산출 취득세액의 10% 일괄 합산 과세</li>
+                    <li class="pt-1 text-amber-600 dark:text-amber-400 font-medium">
+                        ※ 2주택 이상 다주택자의 경우 해당 부동산이 위치한 지역의 <strong>'조정대상지역 여부(서울·수도권 일부 및 지정지역)'</strong>에 따라 다주택
+                        중과세율(8%~12%)이 다르게 적용될 수 있습니다.
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- 하단 푸터 -->
+    <footer
+        class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-3 text-center text-xs text-slate-400">
+        © Smart Toolkit. All data processing happens on client side.
+    </footer>
+
+    <!-- 자바스크립트 계산 로직 -->
+    <script>
+        let currentType = 'trade'; // trade, deposit, rent
+
+        const priceInput = document.getElementById('priceInput');
+        const priceKorean = document.getElementById('priceKorean');
+        const priceLabel = document.getElementById('priceLabel');
+        const propertyType = document.getElementById('propertyType');
+        const houseCount = document.getElementById('houseCount');
+        const monthlyDiv = document.getElementById('monthlyDiv');
+        const houseCountDiv = document.getElementById('houseCountDiv');
+        const taxCard = document.getElementById('taxCard');
+
+        const depositInput = document.getElementById('depositInput');
+        const monthlyInput = document.getElementById('monthlyInput');
+
+        const brokerFeeResult = document.getElementById('brokerFeeResult');
+        const brokerFeeVat = document.getElementById('brokerFeeVat');
+        const brokerRateBadge = document.getElementById('brokerRateBadge');
+
+        const acquisitionTaxResult = document.getElementById('acquisitionTaxResult');
+        const pureTax = document.getElementById('pureTax');
+        const eduTax = document.getElementById('eduTax');
+        const taxRateBadge = document.getElementById('taxRateBadge');
+
+        const totalExtraCost = document.getElementById('totalExtraCost');
+
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const htmlElement = document.documentElement;
+
+        // 다크모드
+        darkModeToggle.addEventListener('click', () => {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        });
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+        } else {
+            htmlElement.classList.remove('dark');
+        }
+
+        const typeBtns = {
+            trade: document.getElementById('typeTrade'),
+            deposit: document.getElementById('typeDeposit'),
+            rent: document.getElementById('typeRent'),
+        };
+
+        Object.keys(typeBtns).forEach(key => {
+            typeBtns[key].addEventListener('click', () => {
+                currentType = key;
+                Object.keys(typeBtns).forEach(k => {
+                    typeBtns[k].className = 'type-btn px-3 py-2 text-xs font-medium rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+                });
+                typeBtns[key].className = 'type-btn active px-3 py-2 text-xs font-medium rounded-md border border-excel-900 bg-excel-900 text-white dark:border-emerald-400 dark:bg-emerald-950 dark:text-emerald-300';
+
+                if (key === 'trade') {
+                    priceLabel.textContent = '매매가 (만원)';
+                    monthlyDiv.classList.add('hidden');
+                    priceInput.parentElement.classList.remove('hidden');
+                    houseCountDiv.classList.remove('hidden');
+                    taxCard.classList.remove('hidden');
+                } else if (key === 'deposit') {
+                    priceLabel.textContent = '전세보증금 (만원)';
+                    monthlyDiv.classList.add('hidden');
+                    priceInput.parentElement.classList.remove('hidden');
+                    houseCountDiv.classList.add('hidden');
+                    taxCard.classList.add('hidden');
+                } else {
+                    priceLabel.textContent = '월세 조건';
+                    monthlyDiv.classList.remove('hidden');
+                    priceInput.parentElement.classList.add('hidden');
+                    houseCountDiv.classList.add('hidden');
+                    taxCard.classList.add('hidden');
+                }
+                calculateAll();
+            });
+        });
+
+        function formatKoreanMoney(manWon) {
+            if (!manWon || manWon <= 0) return '0원';
+            const uk = Math.floor(manWon / 10000);
+            const rest = manWon % 10000;
+            let str = '';
+            if (uk > 0) str += `${uk}억 `;
+            if (rest > 0) str += `${rest.toLocaleString()}만`;
+            return str + '원';
+        }
+
+        function calculateAll() {
+            let transactionAmount = parseFloat(priceInput.value) || 0;
+
+            if (currentType === 'rent') {
+                const dep = parseFloat(depositInput.value) || 0;
+                const mon = parseFloat(monthlyInput.value) || 0;
+                transactionAmount = dep + (mon * 100);
+                if (transactionAmount < 5000) {
+                    transactionAmount = dep + (mon * 70);
+                }
+                priceKorean.textContent = `환산보증금: ${formatKoreanMoney(transactionAmount)}`;
+            } else {
+                priceKorean.textContent = formatKoreanMoney(transactionAmount);
+            }
+
+            // 1. 중개보수 계산 (공인중개사법 시행규칙 제20조)
+            let rate = 0.004;
+            let maxLimit = 0;
+            const selectedProperty = propertyType.value;
+
+            if (selectedProperty === 'officetel') {
+                // 오피스텔 법정 고정 요율
+                if (currentType === 'trade') rate = 0.005; // 매매 0.5%
+                else rate = 0.004; // 임대차 0.4%
+            } else if (selectedProperty === 'land') {
+                rate = 0.009; // 상가/토지 최대 0.9%
+            } else {
+                // 주택 (아파트/빌라) 구간 요율
+                if (currentType === 'trade') {
+                    if (transactionAmount < 5000) { rate = 0.006; maxLimit = 25; }
+                    else if (transactionAmount < 20000) { rate = 0.005; maxLimit = 80; }
+                    else if (transactionAmount < 90000) { rate = 0.004; maxLimit = 0; }
+                    else if (transactionAmount < 120000) { rate = 0.005; maxLimit = 0; }
+                    else { rate = 0.006; maxLimit = 0; }
+                } else {
+                    if (transactionAmount < 5000) { rate = 0.005; maxLimit = 20; }
+                    else if (transactionAmount < 10000) { rate = 0.004; maxLimit = 30; }
+                    else if (transactionAmount < 90000) { rate = 0.003; maxLimit = 0; }
+                    else if (transactionAmount < 120000) { rate = 0.004; maxLimit = 0; }
+                    else { rate = 0.005; maxLimit = 0; }
+                }
+            }
+
+            let brokerFee = Math.floor(transactionAmount * rate);
+            if (maxLimit > 0 && brokerFee > maxLimit) brokerFee = maxLimit;
+
+            brokerRateBadge.textContent = `상한요율 ${(rate * 100).toFixed(1)}%`;
+            brokerFeeResult.textContent = `${brokerFee.toLocaleString()} 만원`;
+            brokerFeeVat.textContent = `${Math.floor(brokerFee * 1.1).toLocaleString()}만원`;
+
+            // 2. 취득세 계산 (지방세법 제11조)
+            let taxFee = 0;
+            let eduTaxFee = 0;
+
+            if (currentType === 'trade') {
+                let pureRate = 0.01;
+                if (selectedProperty === 'officetel' || selectedProperty === 'land') {
+                    pureRate = 0.04; // 주택 외 취득세 기본 4%
+                } else {
+                    if (transactionAmount <= 60000) pureRate = 0.01;
+                    else if (transactionAmount <= 90000) pureRate = (transactionAmount * 2 / 30000 - 3) / 100;
+                    else pureRate = 0.03;
+                }
+
+                taxFee = Math.floor(transactionAmount * pureRate);
+                eduTaxFee = Math.floor(taxFee * 0.1);
+
+                taxRateBadge.textContent = `세율 ${(pureRate * 110).toFixed(1)}%`;
+                acquisitionTaxResult.textContent = `${(taxFee + eduTaxFee).toLocaleString()} 만원`;
+                pureTax.textContent = `${taxFee.toLocaleString()}만원`;
+                eduTax.textContent = `${eduTaxFee.toLocaleString()}만원`;
+            } else {
+                acquisitionTaxResult.textContent = '0 만원';
+            }
+
+            const total = currentType === 'trade' ? (brokerFee + taxFee + eduTaxFee) : brokerFee;
+            totalExtraCost.textContent = `${total.toLocaleString()} 만원`;
+        }
+
+        priceInput.addEventListener('input', calculateAll);
+        depositInput.addEventListener('input', calculateAll);
+        monthlyInput.addEventListener('input', calculateAll);
+        propertyType.addEventListener('change', calculateAll);
+        houseCount.addEventListener('change', calculateAll);
+
+        calculateAll();
+    </script>
+</body>
+
+</html>

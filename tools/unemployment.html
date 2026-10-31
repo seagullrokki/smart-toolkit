@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ko" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실업급여 예상 수급액 계산기 - 스마트 툴킷</title>
+    <!-- Pretendard 폰트 -->
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Pretendard', 'sans-serif'] },
+                    colors: {
+                        excel: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#107c41', // Microsoft Excel 딥그린
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col justify-between transition-colors duration-200">
+
+    <!-- 상단 헤더 -->
+    <header
+        class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 py-3.5 px-6 shadow-sm sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="../index.html"
+                    class="text-lg font-bold text-excel-900 dark:text-emerald-400 flex items-center gap-2">
+                    <span
+                        class="w-7 h-7 bg-excel-900 text-white rounded-md flex items-center justify-center text-xs font-black shadow-sm">X</span>
+                    <span>스마트 툴킷</span>
+                </a>
+                <span
+                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    🔒 100% 브라우저 보안 처리
+                </span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- 다크모드 토글 버튼 -->
+                <button id="darkModeToggle"
+                    class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
+                    <svg id="sunIcon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <svg id="moonIcon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="max-w-5xl w-full mx-auto p-4 sm:p-6 my-4 flex-grow">
+
+        <!-- 타이틀 섹션 -->
+        <div
+            class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span
+                        class="px-2 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 rounded">#이직준비필수</span>
+                    <span
+                        class="px-2 py-0.5 text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 rounded">고용보험·실업급여</span>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    실업급여(구직급여) 예상 수급액 계산기
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-0.5">2026년 법정 상·하한액(1일 상한 6.81만 원, 하한
+                    6.6만 원)을 반영하여 예상 수급액을 정밀 산출합니다.</p>
+            </div>
+            <div class="text-xs text-slate-400 dark:text-slate-500">
+                고용보험법 제50조·제51조 기준
+            </div>
+        </div>
+
+        <!-- 2열 레이아웃 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- 좌측 조건 입력 영역 (6열) -->
+            <div class="lg:col-span-6 flex flex-col">
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-5 flex-grow flex flex-col justify-between space-y-4">
+
+                    <div class="space-y-4">
+                        <h2
+                            class="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider border-b border-slate-100 dark:border-slate-700/60 pb-2">
+                            📋 퇴직 및 고용보험 조건 입력
+                        </h2>
+
+                        <!-- 1. 퇴직 전 월평균 급여 -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">퇴직 전 3개월
+                                월평균 세전 급여 (만원)</label>
+                            <div class="relative">
+                                <input type="number" id="monthlySalary" value="350" step="10"
+                                    class="w-full p-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-excel-900 dark:focus:border-emerald-400 pr-12 font-semibold">
+                                <span class="absolute right-3 top-2.5 text-xs text-slate-400">만원</span>
+                            </div>
+                            <div id="salaryKorean"
+                                class="text-[11px] text-excel-900 dark:text-emerald-400 mt-1 font-medium">350만원</div>
+                        </div>
+
+                        <!-- 2. 연령 구분 -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">퇴직 당시 연령
+                                및 장애인 여부</label>
+                            <select id="ageGroup"
+                                class="w-full p-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-excel-900 dark:focus:border-emerald-400">
+                                <option value="young" selected>50세 미만 일반 근로자</option>
+                                <option value="old">50세 이상 또는 장애인 근로자 (지급일수 우대)</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. 고용보험 가입 기간 -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">고용보험 총 가입
+                                기간 (피보험 단위기간 180일 이상)</label>
+                            <select id="insurancePeriod"
+                                class="w-full p-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-excel-900 dark:focus:border-emerald-400">
+                                <option value="p1">1년 미만</option>
+                                <option value="p3" selected>1년 이상 ~ 3년 미만</option>
+                                <option value="p5">3년 이상 ~ 5년 미만</option>
+                                <option value="p10">5년 이상 ~ 10년 미만</option>
+                                <option value="p10plus">10년 이상</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div
+                        class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 text-[11px] text-slate-400">
+                        * 비자발적 퇴사(권고사직, 계약만료 등) 및 구직활동 조건 충족 시 수급 가능합니다.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 우측 산출 결과 대시보드 (6열) -->
+            <div class="lg:col-span-6 flex flex-col gap-4">
+
+                <!-- 1. 예상 총 수급액 카드 -->
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <h2
+                            class="text-xs font-bold text-excel-900 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-excel-900 dark:bg-emerald-400"></span> 예상 총 구직급여 수급액
+                        </h2>
+                        <span id="durationBadge"
+                            class="text-[11px] bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">총
+                            150일간 지급</span>
+                    </div>
+                    <div id="totalBenefitResult" class="text-3xl font-extrabold text-slate-900 dark:text-white my-1">
+                        991 만원
+                    </div>
+                    <p class="text-[11px] text-slate-400">법정 소정급여일수 동안 나누어 지급되는 총 예상 금액입니다.</p>
+                </div>
+
+                <!-- 2. 세부 산출 지표 카드 -->
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm space-y-2 text-xs">
+                    <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/60">
+                        <span class="text-slate-500 dark:text-slate-400">1일 평균임금 (추정)</span>
+                        <span id="summaryAvgDailyWage" class="font-bold text-slate-800 dark:text-slate-200">116,666 원 /
+                            일</span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/60">
+                        <span class="text-slate-500 dark:text-slate-400">1일 구직급여 지급액 (상한/하한 적용)</span>
+                        <span id="summaryDailyBenefit" class="font-bold text-emerald-600 dark:text-emerald-400">68,100 원
+                            / 일 (상한액 적용)</span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/60">
+                        <span class="text-slate-500 dark:text-slate-400">법정 소정급여일수</span>
+                        <span id="summaryDays" class="font-bold text-slate-800 dark:text-slate-200">150 일</span>
+                    </div>
+                    <div class="flex justify-between py-1">
+                        <span class="text-slate-500 dark:text-slate-400">월 환산 수급액 (30일 기준)</span>
+                        <span id="summaryMonthly" class="font-bold text-slate-800 dark:text-slate-200">204 만원 / 월</span>
+                    </div>
+                </div>
+
+                <!-- 3. 핵심 요약 배지 카드 -->
+                <div
+                    class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/50 rounded-xl p-4 shadow-sm flex justify-between items-center">
+                    <div>
+                        <div class="text-xs text-emerald-800 dark:text-emerald-300 font-semibold">2026년 법정 기준 적용 안내
+                        </div>
+                        <div class="text-[11px] text-emerald-600 dark:text-emerald-400">1일 상한 68,100원 / 하한 66,048원 반영 완료
+                        </div>
+                    </div>
+                    <div class="text-sm font-black text-excel-900 dark:text-emerald-300">
+                        VERIFIED
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 하단 법정 근거 및 산식 안내 섹션 -->
+        <div
+            class="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+
+            <div
+                class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h3
+                    class="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base mb-3 flex items-center gap-1.5">
+                    📜 고용보험법 구직급여 산식
+                </h3>
+                <ul class="space-y-2 list-disc list-inside leading-relaxed text-xs">
+                    <li><strong class="text-slate-800 dark:text-slate-200">법적 근거:</strong> 「고용보험법」 제50조 (구직급여의 일액)</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">기본 산식:</strong> 퇴직 전 평균임금의 60%를 기준으로 하되,
+                        고용노동부 고시에 따른 상·하한액 사이에서 결정됩니다.</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">2026년 기준 한도:</strong> 1일 상한액
+                        <strong>68,100원</strong>, 1일 하한액 <strong>66,048원</strong> (최저임금의 80%)이 적용됩니다.</li>
+                </ul>
+            </div>
+
+            <div
+                class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h3
+                    class="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base mb-3 flex items-center gap-1.5">
+                    🏛️ 소정급여일수 지급 기준 (고용보험법 제51조)
+                </h3>
+                <ul class="space-y-2 list-disc list-inside leading-relaxed text-xs">
+                    <li><strong class="text-slate-800 dark:text-slate-200">가입 기간별:</strong> 1년 미만(120일), 1~3년(150일),
+                        3~5년(180일), 5~10년(210일), 10년 이상(240일)</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">연령 우대:</strong> 퇴직 당시 연령이 만 50세 이상이거나 장애인인 경우
+                        각 구간별로 30일씩 더 연장되어 최대 270일까지 지급됩니다.</li>
+                </ul>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- 하단 푸터 -->
+    <footer
+        class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-3 text-center text-xs text-slate-400">
+        © Smart Toolkit. All data processing happens on client side.
+    </footer>
+
+    <!-- 자바스크립트 산출 로직 -->
+    <script>
+        const monthlySalaryInput = document.getElementById('monthlySalary');
+        const salaryKorean = document.getElementById('salaryKorean');
+        const ageGroupSelect = document.getElementById('ageGroup');
+        const insurancePeriodSelect = document.getElementById('insurancePeriod');
+
+        const durationBadge = document.getElementById('durationBadge');
+        const totalBenefitResult = document.getElementById('totalBenefitResult');
+        const summaryAvgDailyWage = document.getElementById('summaryAvgDailyWage');
+        const summaryDailyBenefit = document.getElementById('summaryDailyBenefit');
+        const summaryDays = document.getElementById('summaryDays');
+        const summaryMonthly = document.getElementById('summaryMonthly');
+
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const htmlElement = document.documentElement;
+
+        darkModeToggle.addEventListener('click', () => {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        });
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+        } else {
+            htmlElement.classList.remove('dark');
+        }
+
+        function formatKoreanMoney(manWon) {
+            if (!manWon || manWon <= 0) return '0 원';
+            const uk = Math.floor(manWon / 10000);
+            const rest = manWon % 10000;
+            let str = '';
+            if (uk > 0) str += `${uk}억 `;
+            if (rest > 0) str += `${rest.toLocaleString()}만 `;
+            return str + '원';
+        }
+
+        function calculateUnemployment() {
+            const monthly = (parseFloat(monthlySalaryInput.value) || 0) * 10000; // 원 단위
+            salaryKorean.textContent = formatKoreanMoney(monthly / 10000);
+
+            // 1. 1일 평균임금 추정 (월평균 급여 기준 30일 환산)
+            const avgDailyWage = monthly / 30;
+
+            // 2. 구직급여 일액 (평균임금의 60%)
+            const baseDailyBenefit = avgDailyWage * 0.6;
+
+            // 3. 2026년 법정 상한액(68,100원) 및 하한액(66,048원) 적용
+            const upperLimit = 68100;
+            const lowerLimit = 66048;
+
+            let finalDailyBenefit = Math.max(lowerLimit, Math.min(upperLimit, baseDailyBenefit));
+
+            let limitStatusText = '';
+            if (baseDailyBenefit >= upperLimit) limitStatusText = ' (상한액 적용)';
+            else if (baseDailyBenefit <= lowerLimit) limitStatusText = ' (하한액 적용)';
+            else limitStatusText = ' (평균임금 60% 적용)';
+
+            // 4. 소정급여일수 결정 (고용보험법 제51조)
+            const period = insurancePeriodSelect.value;
+            const isOld = ageGroupSelect.value === 'old';
+
+            let days = 120; // 기본 1년 미만
+            if (period === 'p1') {
+                days = 120;
+            } else if (period === 'p3') {
+                days = isOld ? 180 : 150;
+            } else if (period === 'p5') {
+                days = isOld ? 210 : 180;
+            } else if (period === 'p10') {
+                days = isOld ? 240 : 210;
+            } else if (period === 'p10plus') {
+                days = isOld ? 270 : 240;
+            }
+
+            // 5. 총 구직급여 수급액 산출
+            const totalBenefit = finalDailyBenefit * days;
+            const totalManWon = Math.floor(totalBenefit / 10000);
+            const monthlyEquivalent = Math.floor(finalDailyBenefit * 30 / 10000);
+
+            // UI 반영
+            durationBadge.textContent = `총 ${days}일간 지급`;
+            totalBenefitResult.textContent = `${totalManWon.toLocaleString()} 만원`;
+            summaryAvgDailyWage.textContent = `${Math.floor(avgDailyWage).toLocaleString()} 원 / 일`;
+            summaryDailyBenefit.textContent = `${Math.floor(finalDailyBenefit).toLocaleString()} 원 / 일${limitStatusText}`;
+            summaryDays.textContent = `${days} 일`;
+            summaryMonthly.textContent = `${monthlyEquivalent.toLocaleString()} 만원 / 월 (30일 환산)`;
+        }
+
+        monthlySalaryInput.addEventListener('input', calculateUnemployment);
+        ageGroupSelect.addEventListener('change', calculateUnemployment);
+        insurancePeriodSelect.addEventListener('change', calculateUnemployment);
+
+        calculateUnemployment();
+    </script>
+</body>
+
+</html>

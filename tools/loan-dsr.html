@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ko" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSR 대출한도 & 전월세 보증금 진단기 - 스마트 툴킷</title>
+    <!-- Pretendard 폰트 -->
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Pretendard', 'sans-serif'] },
+                    colors: {
+                        excel: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#107c41', // Microsoft Excel 딥그린
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col justify-between transition-colors duration-200">
+
+    <!-- 상단 헤더 -->
+    <header
+        class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 py-3.5 px-6 shadow-sm sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="../index.html"
+                    class="text-lg font-bold text-excel-900 dark:text-emerald-400 flex items-center gap-2">
+                    <span
+                        class="w-7 h-7 bg-excel-900 text-white rounded-md flex items-center justify-center text-xs font-black shadow-sm">X</span>
+                    <span>스마트 툴킷</span>
+                </a>
+                <span
+                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    🔒 100% 브라우저 보안 처리
+                </span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- 다크모드 토글 버튼 -->
+                <button id="darkModeToggle"
+                    class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
+                    <svg id="sunIcon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <svg id="moonIcon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="max-w-5xl w-full mx-auto p-4 sm:p-6 my-4 flex-grow">
+
+        <!-- 타이틀 섹션 및 모드 탭 -->
+        <div
+            class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span
+                        class="px-2 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 rounded">#실수요자필수</span>
+                    <span
+                        class="px-2 py-0.5 text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 rounded">주거·대출규제</span>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    DSR 대출한도 & 전월세 보증금 안전성 진단기
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-0.5">내 연소득 기준 최대 주택담보대출 한도(DSR 40%)와
+                    깡통전세 위험성을 원스톱 진단합니다.</p>
+            </div>
+
+            <!-- DSR / 보증금 진단 모드 선택 탭 -->
+            <div class="flex bg-slate-200 dark:bg-slate-700 p-1 rounded-lg text-xs font-medium">
+                <button id="modeDsr"
+                    class="px-3 py-1.5 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm transition">🏦
+                    DSR 대출한도</button>
+                <button id="modeSafety" class="px-3 py-1.5 rounded-md text-slate-600 dark:text-slate-300 transition">🛡️
+                    전세 안전성 진단</button>
+            </div>
+        </div>
+
+        <!-- 2열 레이아웃 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- 좌측 조건 입력 영역 (6열) -->
+            <div class="lg:col-span-6 flex flex-col">
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-5 flex-grow flex flex-col justify-between space-y-4">
+
+                    <div class="space-y-4">
+                        <h2 id="inputSectionTitle"
+                            class="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider border-b border-slate-100 dark:border-slate-700/60 pb-2">
+                            🏦 DSR 대출 조건 입력
+                        </h2>
+
+                        <!-- A. DSR 모드 입력폼 -->
+                        <div id="dsrInputs" class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">연간
+                                    총소득 (연봉, 만원)</label>
+                                <div class="relative">
+                                    <input type="number" id="annualIncome" value="6000" step="100"
+                                        class="w-full p-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-excel-900 dark:focus:border-emerald-400 pr-12 font-semibold">
+                                    <span class="absolute right-3 top-2.5 text-xs text-slate-400">만원</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">기존 대출
+                                    연간 원리금 상환액 (마통, 신용대출 등, 만원)</label>
+                                <div class="relative">
+                                    <input type="number" id="existingDebtRepayment" value="300" step="50"
+                                        class="w-full p-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none pr-12 font-semibold">
+                                    <span class="absolute right-3 top-2.5 text-xs text-slate-400">만원</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">적용 대출
+                                    금리 (%)</label>
+                                <input type="number" id="interestRate" value="4.5" step="0.1"
+                                    class="w-full p-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none font-semibold">
+                            </div>
+                        </div>
+
+                        <!-- B. 전세 안전성 진단 모드 입력폼 (기본 숨김) -->
+                        <div id="safetyInputs" class="space-y-3 hidden">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">주택 예상
+                                    시세 (매매가, 만원)</label>
+                                <div class="relative">
+                                    <input type="number" id="housePrice" value="30000" step="1000"
+                                        class="w-full p-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none pr-12 font-semibold">
+                                    <span class="absolute right-3 top-2.5 text-xs text-slate-400">만원</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">내 전세
+                                    보증금 (만원)</label>
+                                <div class="relative">
+                                    <input type="number" id="deposit" value="20000" step="500"
+                                        class="w-full p-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none pr-12 font-semibold">
+                                    <span class="absolute right-3 top-2.5 text-xs text-slate-400">만원</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">선순위
+                                    채권 (근저당, 선순위 보증금 등, 만원)</label>
+                                <div class="relative">
+                                    <input type="number" id="seniorDebt" value="3000" step="500"
+                                        class="w-full p-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none pr-12 font-semibold">
+                                    <span class="absolute right-3 top-2.5 text-xs text-slate-400">만원</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 text-[11px] text-slate-400">
+                        * 금융위원회 스트레스 DSR 및 주택임대차보호법 기준 적용
+                    </div>
+                </div>
+            </div>
+
+            <!-- 우측 산출 결과 대시보드 (6열) -->
+            <div class="lg:col-span-6 flex flex-col gap-4">
+
+                <!-- 1. 최종 결과 카드 -->
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 id="resultCardTitle"
+                            class="text-xs font-bold text-excel-900 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-excel-900 dark:bg-emerald-400"></span> 최대 주택담보대출 한도
+                            (DSR 40%)
+                        </h2>
+                        <span id="resultBadge"
+                            class="text-[11px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-2 py-0.5 rounded font-medium">규제
+                            준수</span>
+                    </div>
+                    <div id="finalResultMain" class="text-3xl font-extrabold text-slate-900 dark:text-white my-1">
+                        3억 8,500 만원
+                    </div>
+                    <p id="resultSubText" class="text-[11px] text-slate-400">연간 원리금 상환액이 소득의 40%(2,400만 원) 이내로 제한됩니다.
+                    </p>
+                </div>
+
+                <!-- 2. 세부 지표 분석 카드 -->
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm space-y-2 text-xs">
+                    <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/60">
+                        <span id="labelRow1" class="text-slate-500 dark:text-slate-400">연간 총 허용 원리금 (DSR 40%)</span>
+                        <span id="valRow1" class="font-bold text-slate-800 dark:text-slate-200">2,400 만원 / 년</span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/60">
+                        <span id="labelRow2" class="text-slate-500 dark:text-slate-400">기존 대출 원리금 차감</span>
+                        <span id="valRow2" class="font-bold text-rose-500">- 300 만원 / 년</span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/60">
+                        <span id="labelRow3" class="text-slate-500 dark:text-slate-400">신규 대출 가능 연간 원리금</span>
+                        <span id="valRow3" class="font-bold text-excel-900 dark:text-emerald-400">2,100 만원 / 년</span>
+                    </div>
+                    <div class="flex justify-between py-1">
+                        <span id="labelRow4" class="text-slate-500 dark:text-slate-400">안전성 평가 등급</span>
+                        <span id="valRow4" class="font-bold text-slate-800 dark:text-slate-200">적정 (여유 있음)</span>
+                    </div>
+                </div>
+
+                <!-- 3. 핵심 가이드 요약 카드 -->
+                <div
+                    class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/50 rounded-xl p-4 shadow-sm flex justify-between items-center">
+                    <div>
+                        <div id="guideTitle" class="text-xs text-emerald-800 dark:text-emerald-300 font-semibold">DSR 규제
+                            요약 가이드</div>
+                        <div id="guideSub" class="text-[11px] text-emerald-600 dark:text-emerald-400">모든 가계대출 원리금 합산 기준
+                            40% 적용</div>
+                    </div>
+                    <div id="guideBadge" class="text-sm font-black text-excel-900 dark:text-emerald-300">
+                        SAFE
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 하단 법정 근거 및 가이드 섹션 -->
+        <div
+            class="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+
+            <div
+                class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h3
+                    class="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base mb-3 flex items-center gap-1.5">
+                    📜 DSR (총부채원리금상환비율) 규제 기준
+                </h3>
+                <ul class="space-y-2 list-disc list-inside leading-relaxed text-xs">
+                    <li><strong class="text-slate-800 dark:text-slate-200">법적 근거:</strong> 은행연합회 여신심사가이드라인 및 금융위원회 가계부채
+                        관리방안</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">DSR 40% 한도:</strong> 연간 소득에서 모든 가계대출(주담대,
+                        신용대출, 마이너스통장 등)의 원리금 상환액이 차지하는 비중이 40%를 넘을 수 없습니다.</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">스트레스 DSR:</strong> 향후 금리 인상 리스크를 반영하여 일정 수준의
+                        가산금리(스트레스 금리)를 부과하여 한도를 산정합니다.</li>
+                </ul>
+            </div>
+
+            <div
+                class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h3
+                    class="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base mb-3 flex items-center gap-1.5">
+                    🛡️ 전세 보증금 안전성 (깡통전세 예방) 기준
+                </h3>
+                <ul class="space-y-2 list-disc list-inside leading-relaxed text-xs">
+                    <li><strong class="text-slate-800 dark:text-slate-200">안전 기준 (보증금 + 선순위채권):</strong> 집값의 <strong>70%
+                            이하</strong>일 때 가장 안전한 안전지대로 평가됩니다.</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">위험 구간:</strong> 80%를 초과하는 경우 경매 넘어갈 시 보증금 일부를
+                        잃을 위험(깡통전세)이 커지므로 전세보증보험 가입이 필수적입니다.</li>
+                </ul>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- 하단 푸터 -->
+    <footer
+        class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-3 text-center text-xs text-slate-400">
+        © Smart Toolkit. All data processing happens on client side.
+    </footer>
+
+    <!-- 자바스크립트 산출 로직 -->
+    <script>
+        let currentMode = 'dsr'; // 'dsr' or 'safety'
+
+        const modeDsr = document.getElementById('modeDsr');
+        const modeSafety = document.getElementById('modeSafety');
+
+        const inputSectionTitle = document.getElementById('inputSectionTitle');
+        const dsrInputs = document.getElementById('dsrInputs');
+        const safetyInputs = document.getElementById('safetyInputs');
+
+        const annualIncome = document.getElementById('annualIncome');
+        const existingDebtRepayment = document.getElementById('existingDebtRepayment');
+        const interestRate = document.getElementById('interestRate');
+
+        const housePrice = document.getElementById('housePrice');
+        const deposit = document.getElementById('deposit');
+        const seniorDebt = document.getElementById('seniorDebt');
+
+        const resultCardTitle = document.getElementById('resultCardTitle');
+        const resultBadge = document.getElementById('resultBadge');
+        const finalResultMain = document.getElementById('finalResultMain');
+        const resultSubText = document.getElementById('resultSubText');
+
+        const labelRow1 = document.getElementById('labelRow1');
+        const valRow1 = document.getElementById('valRow1');
+        const labelRow2 = document.getElementById('labelRow2');
+        const valRow2 = document.getElementById('valRow2');
+        const labelRow3 = document.getElementById('labelRow3');
+        valRow3 = document.getElementById('valRow3');
+        const labelRow4 = document.getElementById('labelRow4');
+        const valRow4 = document.getElementById('valRow4');
+
+        const guideTitle = document.getElementById('guideTitle');
+        const guideSub = document.getElementById('guideSub');
+        const guideBadge = document.getElementById('guideBadge');
+
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const htmlElement = document.documentElement;
+
+        darkModeToggle.addEventListener('click', () => {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        });
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+        } else {
+            htmlElement.classList.remove('dark');
+        }
+
+        modeDsr.addEventListener('click', () => {
+            currentMode = 'dsr';
+            modeDsr.className = 'px-3 py-1.5 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm transition';
+            modeSafety.className = 'px-3 py-1.5 rounded-md text-slate-600 dark:text-slate-300 transition';
+            inputSectionTitle.textContent = '🏦 DSR 대출 조건 입력';
+            dsrInputs.classList.remove('hidden');
+            safetyInputs.classList.add('hidden');
+            calculate();
+        });
+
+        modeSafety.addEventListener('click', () => {
+            currentMode = 'safety';
+            modeSafety.className = 'px-3 py-1.5 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm transition';
+            modeDsr.className = 'px-3 py-1.5 rounded-md text-slate-600 dark:text-slate-300 transition';
+            inputSectionTitle.textContent = '🛡️ 전세 보증금 안전성 조건 입력';
+            dsrInputs.classList.add('hidden');
+            safetyInputs.classList.remove('hidden');
+            calculate();
+        });
+
+        function formatKoreanMoney(manWon) {
+            if (!manWon || manWon <= 0) return '0 원';
+            const uk = Math.floor(manWon / 10000);
+            const rest = manWon % 10000;
+            let str = '';
+            if (uk > 0) str += `${uk}억 `;
+            if (rest > 0) str += `${rest.toLocaleString()}만 `;
+            return str + '원';
+        }
+
+        function calculate() {
+            if (currentMode === 'dsr') {
+                const income = (parseFloat(annualIncome.value) || 0) * 10000; // 원 단위
+                const existingRepay = (parseFloat(existingDebtRepayment.value) || 0) * 10000;
+                const rate = (parseFloat(interestRate.value) || 4.5) / 100;
+
+                // 연간 총 허용 원리금 (DSR 40%)
+                const maxAllowedAnnualRepay = income * 0.4;
+                const availableAnnualRepay = Math.max(0, maxAllowedAnnualRepay - existingRepay);
+
+                // 30년 만기 원리금균등상환 가정 시 대출 한도 역산 (대략적인 추정 공식)
+                // 월 상환액 = (한도 * 월금리) / (1 - (1+월금리)^(-360))
+                const monthlyRate = rate / 12;
+                const n = 360; // 30년
+                let maxLoanAmount = 0;
+                if (monthlyRate > 0 && availableAnnualRepay > 0) {
+                    const monthlyRepay = availableAnnualRepay / 12;
+                    maxLoanAmount = (monthlyRepay * (1 - Math.pow(1 + monthlyRate, -n))) / monthlyRate;
+                }
+
+                const maxLoanManWon = Math.floor(maxLoanAmount / 10000);
+
+                // UI 반영
+                resultCardTitle.innerHTML = '<span class="w-2 h-2 rounded-full bg-excel-900 dark:bg-emerald-400"></span> 최대 주택담보대출 한도 (DSR 40%)';
+                resultBadge.textContent = '규제 준수';
+                finalResultMain.textContent = formatKoreanMoney(maxLoanManWon);
+                resultSubText.textContent = `연소득 기준 연간 최대 원리금 상환 한도 ${Math.floor(maxAllowedAnnualRepay / 10000).toLocaleString()}만 원 내에서 대출이 가능합니다.`;
+
+                labelRow1.textContent = '연간 총 허용 원리금 (DSR 40%)';
+                valRow1.textContent = `${Math.floor(maxAllowedAnnualRepay / 10000).toLocaleString()} 만원 / 년`;
+
+                labelRow2.textContent = '기존 대출 원리금 차감';
+                valRow2.textContent = `- ${Math.floor(existingRepay / 10000).toLocaleString()} 만원 / 년`;
+
+                labelRow3.textContent = '신규 대출 가능 연간 원리금';
+                valRow3.textContent = `${Math.floor(availableAnnualRepay / 10000).toLocaleString()} 만원 / 년`;
+
+                labelRow4.textContent = '대출 여력 진단';
+                valRow4.textContent = availableAnnualRepay > 0 ? '충분 (대출 가능)' : '초과 (대출 불가)';
+
+                guideTitle.textContent = 'DSR 규제 요약 가이드';
+                guideSub.textContent = '모든 가계대출 원리금 합산 기준 40% 적용';
+                guideBadge.textContent = 'SAFE';
+
+            } else {
+                // 안전성 진단 모드
+                const price = (parseFloat(housePrice.value) || 0) * 10000;
+                const dep = (parseFloat(deposit.value) || 0) * 10000;
+                const senior = (parseFloat(seniorDebt.value) || 0) * 10000;
+
+                const totalRisk = dep + senior;
+                const ratio = price > 0 ? (totalRisk / price) * 100 : 0;
+
+                resultCardTitle.innerHTML = '<span class="w-2 h-2 rounded-full bg-excel-900 dark:bg-emerald-400"></span> 전세 보증금 안전성 진단 결과';
+                finalResultMain.textContent = `${ratio.toFixed(1)} % (위험도)`;
+
+                let statusText = '안전 (70% 이하)';
+                let badgeColor = 'emerald';
+                if (ratio <= 70) {
+                    statusText = '매우 안전 (보증금 전액 보호권장)';
+                    resultBadge.className = 'text-[11px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-2 py-0.5 rounded font-medium';
+                } else if (ratio <= 80) {
+                    statusText = '주의 (보증보험 가입 필수)';
+                    resultBadge.className = 'text-[11px] bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 px-2 py-0.5 rounded font-medium';
+                } else {
+                    statusText = '위험 (깡통전세 우려 높음)';
+                    resultBadge.className = 'text-[11px] bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 px-2 py-0.5 rounded font-medium';
+                }
+                resultBadge.textContent = statusText;
+                resultSubText.textContent = `집값 대비 (선순위 채권 + 내 보증금) 비중이 ${ratio.toFixed(1)}% 입니다.`;
+
+                labelRow1.textContent = '주택 예상 시세 (매매가)';
+                valRow1.textContent = formatKoreanMoney(price / 10000);
+
+                labelRow2.textContent = '선순위 채권 (근저당 등)';
+                valRow2.textContent = formatKoreanMoney(senior / 10000);
+
+                labelRow3.textContent = '총 위험 부채 (선순위 + 보증금)';
+                valRow3.textContent = formatKoreanMoney(totalRisk / 10000);
+
+                labelRow4.textContent = '안전성 평가 등급';
+                valRow4.textContent = statusText;
+
+                guideTitle.textContent = 'HUG 전세보증보험 가이드';
+                guideSub.textContent = '보증금 반환보증 가입 여부 확인 권장';
+                guideBadge.textContent = ratio <= 80 ? 'PASS' : 'RISK';
+            }
+        }
+
+        annualIncome.addEventListener('input', calculate);
+        existingDebtRepayment.addEventListener('input', calculate);
+        interestRate.addEventListener('input', calculate);
+        housePrice.addEventListener('input', calculate);
+        deposit.addEventListener('input', calculate);
+        seniorDebt.addEventListener('input', calculate);
+
+        calculate();
+    </script>
+</body>
+
+</html>

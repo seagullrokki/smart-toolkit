@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ko" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>알바비 & 주휴·야간수당 계산기 - 스마트 툴킷</title>
+    <!-- Pretendard 폰트 -->
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Pretendard', 'sans-serif'] },
+                    colors: {
+                        excel: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#107c41', // Microsoft Excel 딥그린
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col justify-between transition-colors duration-200">
+
+    <!-- 상단 헤더 -->
+    <header
+        class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 py-3.5 px-6 shadow-sm sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="../index.html"
+                    class="text-lg font-bold text-excel-900 dark:text-emerald-400 flex items-center gap-2">
+                    <span
+                        class="w-7 h-7 bg-excel-900 text-white rounded-md flex items-center justify-center text-xs font-black shadow-sm">X</span>
+                    <span>스마트 툴킷</span>
+                </a>
+                <span
+                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    🔒 100% 브라우저 보안 처리
+                </span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- 다크모드 토글 버튼 -->
+                <button id="darkModeToggle"
+                    class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
+                    <svg id="sunIcon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <svg id="moonIcon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="max-w-5xl w-full mx-auto p-4 sm:p-6 my-4 flex-grow">
+
+        <!-- 타이틀 섹션 -->
+        <div
+            class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span
+                        class="px-2 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 rounded">#전연령공통</span>
+                    <span
+                        class="px-2 py-0.5 text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 rounded">아르바이트·근로기준법</span>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    알바비 원스톱 계산기 (주간/야간 분리 입력)
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-0.5">주간 및 야간 근무 스케줄을 각각 자유롭게 입력하여
+                    주휴수당 및 야간가산수당을 직관적으로 산출합니다.</p>
+            </div>
+            <div class="text-xs text-slate-400 dark:text-slate-500">
+                근로기준법 제55조·제56조 기준
+            </div>
+        </div>
+
+        <!-- 2열 레이아웃 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- 좌측 조건 입력 영역 (6열) -->
+            <div class="lg:col-span-6 flex flex-col">
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-5 flex-grow flex flex-col justify-between space-y-4">
+
+                    <div class="space-y-4">
+                        <h2
+                            class="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider border-b border-slate-100 dark:border-slate-700/60 pb-2">
+                            ⏱️ 근로자 연령 및 시급 설정
+                        </h2>
+
+                        <!-- 1. 연령 구분 (성년자 vs 미성년자) -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">근로자
+                                연령 구분</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" id="ageAdult"
+                                    class="age-btn active px-3 py-2 text-xs font-medium rounded-md border border-excel-900 bg-excel-900 text-white dark:border-emerald-400 dark:bg-emerald-950 dark:text-emerald-300">성인
+                                    (만 18세 이상)</button>
+                                <button type="button" id="ageMinor"
+                                    class="age-btn px-3 py-2 text-xs font-medium rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300">미성년자
+                                    (만 15~18세 미만)</button>
+                            </div>
+                            <p id="ageNotice" class="text-[11px] text-slate-400 mt-1">
+                                * 성인: 1일 8시간 / 1주 40시간 법정 제한 적용
+                            </p>
+                        </div>
+
+                        <!-- 2. 시급 입력 -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-semibold text-slate-600 dark:text-slate-300">기본 시급
+                                    (원)</label>
+                                <button type="button" id="setMinimumWageBtn"
+                                    class="text-[11px] text-excel-900 dark:text-emerald-400 font-medium hover:underline">
+                                    2026년 최저시급 적용 (10,320원)
+                                </button>
+                            </div>
+                            <div class="relative">
+                                <input type="number" id="hourlyWage" value="10320" step="10"
+                                    class="w-full p-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-excel-900 dark:focus:border-emerald-400 pr-10 font-semibold">
+                                <span class="absolute right-3 top-2.5 text-xs text-slate-400">원</span>
+                            </div>
+                        </div>
+
+                        <h2
+                            class="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider border-b border-slate-100 dark:border-slate-700/60 pb-2 pt-2">
+                            📅 주간 / 야간 스케줄 분리 입력
+                        </h2>
+
+                        <!-- 3. 주간 근무 조건 (06:00 ~ 22:00) -->
+                        <div
+                            class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700 space-y-2">
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-200 block">☀️ 주간 근무 (06:00
+                                ~ 22:00)</span>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[11px] text-slate-500 mb-0.5">주간 근무일수 (1주일)</label>
+                                    <div class="relative">
+                                        <input type="number" id="dayDays" value="3" step="1" min="0" max="7"
+                                            class="w-full p-2 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded focus:outline-none pr-7">
+                                        <span class="absolute right-2 top-2 text-xs text-slate-400">일</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] text-slate-500 mb-0.5">1일 주간근무 시간</label>
+                                    <div class="relative">
+                                        <input type="number" id="dayHours" value="8" step="0.5" min="0" max="16"
+                                            class="w-full p-2 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded focus:outline-none pr-9">
+                                        <span class="absolute right-2 top-2 text-xs text-slate-400">시간</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. 야간 근무 조건 (22:00 ~ 06:00) -->
+                        <div
+                            class="bg-indigo-50/50 dark:bg-indigo-950/20 p-3 rounded-lg border border-indigo-100 dark:border-indigo-900/40 space-y-2">
+                            <span class="text-xs font-bold text-indigo-900 dark:text-indigo-300 block">🌙 야간 근무
+                                (22:00 ~ 06:00 사이)</span>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[11px] text-indigo-700 dark:text-indigo-300 mb-0.5">야간
+                                        근무일수 (1주일)</label>
+                                    <div class="relative">
+                                        <input type="number" id="nightDays" value="2" step="1" min="0" max="7"
+                                            class="w-full p-2 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded focus:outline-none pr-7">
+                                        <span class="absolute right-2 top-2 text-xs text-slate-400">일</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] text-indigo-700 dark:text-indigo-300 mb-0.5">1일
+                                        야간근무 시간</label>
+                                    <div class="relative">
+                                        <input type="number" id="nightHours" value="4" step="0.5" min="0" max="8"
+                                            class="w-full p-2 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded focus:outline-none pr-9">
+                                        <span class="absolute right-2 top-2 text-xs text-slate-400">시간</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-indigo-600 dark:text-indigo-400">* 야간 근무 시간대는 통상시급의 50%가 추가
+                                가산됩니다.</p>
+                        </div>
+
+                        <!-- 5. 세금 공제 선택 -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">세금 공제
+                                방식</label>
+                            <select id="taxType"
+                                class="w-full p-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-excel-900 dark:focus:border-emerald-400">
+                                <option value="none">공제 없음 (100% 실수령)</option>
+                                <option value="3.3">사업소득세 3.3% 공제 (프리랜서 알바)</option>
+                                <option value="4in">4대 보험 9.7% 공제 (일반 근로자)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 text-[11px] text-slate-400">
+                        * 총 근로시간 주 15시간 이상 개근 시 주휴수당이 자동 합산됩니다.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 우측 산출 결과 대시보드 (6열) -->
+            <div class="lg:col-span-6 flex flex-col gap-4">
+
+                <!-- 법정 근거 초과 경고 창 (기본 숨김) -->
+                <div id="legalErrorCard"
+                    class="hidden bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 rounded-xl p-5 shadow-sm">
+                    <div class="flex items-center gap-2 text-rose-700 dark:text-rose-300 font-bold text-sm mb-2">
+                        <span>🚨 미성년자 근로기준법 초과 (계산 불가)</span>
+                    </div>
+                    <p id="legalErrorMessage" class="text-xs text-rose-600 dark:text-rose-400 leading-relaxed">
+                        미성년자는 근로기준법 제69조에 따라 1일 7시간, 1주 35시간을 초과하여 근무할 수 없습니다.
+                    </p>
+                </div>
+
+                <!-- 1. 예상 월급 최종 수령액 카드 -->
+                <div id="mainResultCard"
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <h2
+                            class="text-xs font-bold text-excel-900 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-excel-900 dark:bg-emerald-400"></span> 실수령 예상 월급
+                            (4.345주 기준)
+                        </h2>
+                        <span id="weeklyHoursBadge"
+                            class="text-[11px] bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">주
+                            32시간 근무</span>
+                    </div>
+                    <div id="finalMonthlyPay" class="text-3xl font-extrabold text-slate-900 dark:text-white my-1">
+                        1,883,610 원
+                    </div>
+                    <p class="text-[11px] text-slate-400">기본급 + 주휴수당 + 야간가산수당 포함 (세후 산출)</p>
+                </div>
+
+                <!-- 2. 세부 수당 내역 분해 카드 -->
+                <div id="detailResultCard"
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm space-y-2 text-xs">
+                    <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/60">
+                        <span class="text-slate-500 dark:text-slate-400">기본 월급 (주간+야간 기본시급)</span>
+                        <span id="basePay" class="font-bold text-slate-800 dark:text-slate-200">1,434,860 원</span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/60">
+                        <span class="text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                            주휴수당 <span id="weeklyRestEligible"
+                                class="text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-1.5 py-0.2 rounded">발생</span>
+                        </span>
+                        <span id="weeklyRestPay" class="font-bold text-emerald-600 dark:text-emerald-400">+ 286,970
+                            원</span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/60">
+                        <span class="text-slate-500 dark:text-slate-400">야간가산수당 (50% 추가)</span>
+                        <span id="nightPay" class="font-bold text-slate-800 dark:text-slate-200">+ 161,780 원</span>
+                    </div>
+                    <div class="flex justify-between py-1">
+                        <span class="text-slate-500 dark:text-slate-400">세금 및 4대보험 공제액</span>
+                        <span id="taxDeduction" class="font-bold text-rose-500">- 0 원</span>
+                    </div>
+                </div>
+
+                <!-- 3. 주급 예상액 요약 카드 -->
+                <div id="weeklyResultCard"
+                    class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/50 rounded-xl p-4 shadow-sm flex justify-between items-center">
+                    <div>
+                        <div class="text-xs text-emerald-800 dark:text-emerald-300 font-semibold">주급 예상액 (1주일 기준)
+                        </div>
+                        <div class="text-[11px] text-emerald-600 dark:text-emerald-400">(기본주급 + 주휴 + 야간가산)</div>
+                    </div>
+                    <div id="weeklyTotalPay" class="text-xl font-black text-excel-900 dark:text-emerald-300">
+                        433,510 원
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 하단 법정 근거 및 가이드 섹션 -->
+        <div
+            class="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+
+            <div
+                class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h3
+                    class="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base mb-3 flex items-center gap-1.5">
+                    📜 주간/야간 분리 계산 근거
+                </h3>
+                <ul class="space-y-2 list-disc list-inside leading-relaxed text-xs">
+                    <li><strong class="text-slate-800 dark:text-slate-200">기본급 합산:</strong> 주간과 야간에 일한 전체 시간의 합에
+                        통상시급을 곱합니다.</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">야간가산수당 (근로기준법 제56조):</strong> 오후 10시~오전
+                        6시 사이에 일한 시간만 추출하여 시급의 50%를 별도로 추가 지급합니다.</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">주휴수당 통합:</strong> 주간/야간을 합쳐서 일주일 총 근로시간이
+                        15시간 이상이면 발생합니다.</li>
+                </ul>
+            </div>
+
+            <div
+                class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h3
+                    class="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base mb-3 flex items-center gap-1.5">
+                    ⚖️ 법정 수당 공식 (알바천국 연동)
+                </h3>
+                <ul class="space-y-2 list-disc list-inside leading-relaxed text-xs">
+                    <li><strong class="text-slate-800 dark:text-slate-200">주휴수당 산식:</strong> <span
+                            class="font-mono text-[11px] bg-slate-100 dark:bg-slate-700 px-1 rounded">(주간+야간 총시간 ÷
+                            40) × 8 × 시급</span></li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">한 달 기준 환산:</strong> 알바천국 표준과 동일하게 1개월을
+                        <strong>4.345주</strong>로 계산합니다.
+                    </li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">최저임금법:</strong> 2026년 최저시급은
+                        <strong>10,320원</strong>입니다.
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- 하단 푸터 -->
+    <footer
+        class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-3 text-center text-xs text-slate-400">
+        © Smart Toolkit. All data processing happens on client side.
+    </footer>
+
+    <!-- 자바스크립트 산출 로직 -->
+    <script>
+        let isMinor = false; // false: 성인, true: 미성년자
+
+        const ageAdultBtn = document.getElementById('ageAdult');
+        const ageMinorBtn = document.getElementById('ageMinor');
+        const ageNotice = document.getElementById('ageNotice');
+
+        const hourlyWageInput = document.getElementById('hourlyWage');
+        const setMinimumWageBtn = document.getElementById('setMinimumWageBtn');
+
+        const dayDaysInput = document.getElementById('dayDays');
+        const dayHoursInput = document.getElementById('dayHours');
+        const nightDaysInput = document.getElementById('nightDays');
+        const nightHoursInput = document.getElementById('nightHours');
+        const taxTypeSelect = document.getElementById('taxType');
+
+        const legalErrorCard = document.getElementById('legalErrorCard');
+        const legalErrorMessage = document.getElementById('legalErrorMessage');
+        const mainResultCard = document.getElementById('mainResultCard');
+        const detailResultCard = document.getElementById('detailResultCard');
+        const weeklyResultCard = document.getElementById('weeklyResultCard');
+
+        const finalMonthlyPay = document.getElementById('finalMonthlyPay');
+        const weeklyHoursBadge = document.getElementById('weeklyHoursBadge');
+        const basePayEl = document.getElementById('basePay');
+        const weeklyRestPayEl = document.getElementById('weeklyRestPay');
+        const weeklyRestEligible = document.getElementById('weeklyRestEligible');
+        const nightPayEl = document.getElementById('nightPay');
+        const taxDeductionEl = document.getElementById('taxDeduction');
+        const weeklyTotalPayEl = document.getElementById('weeklyTotalPay');
+
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const htmlElement = document.documentElement;
+
+        darkModeToggle.addEventListener('click', () => {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        });
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+        } else {
+            htmlElement.classList.remove('dark');
+        }
+
+        // 연령 구분 버튼 이벤트
+        ageAdultBtn.addEventListener('click', () => {
+            isMinor = false;
+            ageAdultBtn.className = 'age-btn active px-3 py-2 text-xs font-medium rounded-md border border-excel-900 bg-excel-900 text-white dark:border-emerald-400 dark:bg-emerald-950 dark:text-emerald-300';
+            ageMinorBtn.className = 'age-btn px-3 py-2 text-xs font-medium rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+            ageNotice.textContent = '* 성인: 1일 8시간 / 1주 40시간 법정 제한 적용';
+            calculateAll();
+        });
+
+        ageMinorBtn.addEventListener('click', () => {
+            isMinor = true;
+            ageMinorBtn.className = 'age-btn active px-3 py-2 text-xs font-medium rounded-md border border-excel-900 bg-excel-900 text-white dark:border-emerald-400 dark:bg-emerald-950 dark:text-emerald-300';
+            ageAdultBtn.className = 'age-btn px-3 py-2 text-xs font-medium rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+            ageNotice.textContent = '⚠️ 미성년자: 1일 7시간 / 1주 35시간 법정 한도 제한 (근로기준법 제69조)';
+            calculateAll();
+        });
+
+        setMinimumWageBtn.addEventListener('click', () => {
+            hourlyWageInput.value = 10320;
+            calculateAll();
+        });
+
+        function calculateAll() {
+            const wage = parseFloat(hourlyWageInput.value) || 0;
+
+            const dayDays = parseFloat(dayDaysInput.value) || 0;
+            const dayHours = parseFloat(dayHoursInput.value) || 0;
+            const nightDays = parseFloat(nightDaysInput.value) || 0;
+            const nightHours = parseFloat(nightHoursInput.value) || 0;
+
+            // 주간/야간 총 근로시간 계산
+            const weeklyDayTotalHours = dayDays * dayHours;
+            const weeklyNightTotalHours = nightDays * nightHours;
+            const weeklyTotalHours = weeklyDayTotalHours + weeklyNightTotalHours;
+
+            // 🚨 미성년자 근로기준법 초과 검증 (1일 8시간 초과 OR 1주 40시간 초과 시 차단)
+            if (isMinor) {
+                if (dayHours > 8 || nightHours > 8 || weeklyTotalHours > 40) {
+                    legalErrorCard.classList.remove('hidden');
+                    legalErrorMessage.innerHTML = `미성년자는 근로기준법 제69조에 따라 1일 7시간(최대 8시간), 1주 35시간(최대 40시간)을 초과할 수 없습니다.<br><strong>[현재 입력: 1주 ${weeklyTotalHours}시간 - 위법으로 계산 불가]</strong>`;
+                    mainResultCard.classList.add('hidden');
+                    detailResultCard.classList.add('hidden');
+                    weeklyResultCard.classList.add('hidden');
+                    return;
+                }
+            }
+
+            // 위법이 아닌 경우 경고창 숨기고 계산 결과 카드 표시
+            legalErrorCard.classList.add('hidden');
+            mainResultCard.classList.remove('hidden');
+            detailResultCard.classList.remove('hidden');
+            weeklyResultCard.classList.remove('hidden');
+
+            weeklyHoursBadge.textContent = `주 ${weeklyTotalHours}시간 근무`;
+
+            // 1. 기본 주급 및 기본 월급 (통상 시급 100%)
+            const weeklyBasePay = wage * weeklyTotalHours;
+            const monthlyBasePay = weeklyBasePay * 4.345;
+
+            // 2. 주휴수당 (주 15시간 이상 시 발생)
+            let weeklyRestPay = 0;
+            if (weeklyTotalHours >= 15) {
+                weeklyRestEligible.textContent = '발생';
+                weeklyRestEligible.className = 'text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-1.5 py-0.2 rounded';
+
+                const restHours = Math.min(8, (weeklyTotalHours / 40) * 8);
+                weeklyRestPay = restHours * wage;
+            } else {
+                weeklyRestEligible.textContent = '미대상 (주15시간 미만)';
+                weeklyRestEligible.className = 'text-[10px] bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400 px-1.5 py-0.2 rounded';
+            }
+            const monthlyRestPay = weeklyRestPay * 4.345;
+
+            // 3. 야간가산수당 (야간 근로시간에 대해 50% 추가)
+            const weeklyNightExtraPay = weeklyNightTotalHours * (wage * 0.5);
+            const monthlyNightExtraPay = weeklyNightExtraPay * 4.345;
+
+            // 총 세전 월급
+            const totalGrossMonthlyPay = monthlyBasePay + monthlyRestPay + monthlyNightExtraPay;
+
+            // 4. 세금 및 공제액 계산
+            const taxType = taxTypeSelect.value;
+            let taxAmount = 0;
+            if (taxType === '3.3') {
+                taxAmount = totalGrossMonthlyPay * 0.033;
+            } else if (taxType === '4in') {
+                taxAmount = totalGrossMonthlyPay * 0.097;
+            }
+
+            const finalPay = Math.floor(totalGrossMonthlyPay - taxAmount);
+
+            // 대시보드 출력 업데이트
+            finalMonthlyPay.textContent = `${finalPay.toLocaleString()} 원`;
+            basePayEl.textContent = `${Math.floor(monthlyBasePay).toLocaleString()} 원`;
+            weeklyRestPayEl.textContent = `+ ${Math.floor(monthlyRestPay).toLocaleString()} 원`;
+            nightPayEl.textContent = `+ ${Math.floor(monthlyNightExtraPay).toLocaleString()} 원`;
+            taxDeductionEl.textContent = `- ${Math.floor(taxAmount).toLocaleString()} 원`;
+
+            const weeklyTotal = Math.floor(weeklyBasePay + weeklyRestPay + weeklyNightExtraPay);
+            weeklyTotalPayEl.textContent = `${weeklyTotal.toLocaleString()} 원`;
+        }
+
+        hourlyWageInput.addEventListener('input', calculateAll);
+        dayDaysInput.addEventListener('input', calculateAll);
+        dayHoursInput.addEventListener('input', calculateAll);
+        nightDaysInput.addEventListener('input', calculateAll);
+        nightHoursInput.addEventListener('input', calculateAll);
+        taxTypeSelect.addEventListener('change', calculateAll);
+
+        calculateAll();
+    </script>
+</body>
+
+</html>
